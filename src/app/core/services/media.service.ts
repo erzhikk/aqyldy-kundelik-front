@@ -35,6 +35,17 @@ export interface ReconcileResponse {
 }
 
 /**
+ * Response from direct upload endpoint
+ */
+export interface DirectUploadResponse {
+  mediaObjectId: string;
+  key: string;
+  width: number;
+  height: number;
+  fileSize: number;
+}
+
+/**
  * Media Service
  *
  * Handles file upload operations:
@@ -160,6 +171,79 @@ export class MediaService {
       xhr.open('PUT', presignedUrl);
       xhr.setRequestHeader('Content-Type', contentType);
       xhr.send(file);
+    });
+  }
+
+  /**
+   * Upload photo directly through backend (bypasses CORS issues)
+   *
+   * This method uploads the file to backend, which then uploads to MinIO.
+   * Backend handles validation and returns mediaObjectId.
+   *
+   * @param userId User ID for the upload
+   * @param file File to upload
+   * @param onProgress Optional callback for upload progress
+   * @returns Promise with upload result including mediaObjectId
+   *
+   * @example
+   * const result = await mediaService.uploadPhotoDirect('user-id', file, (progress) => {
+   *   console.log(`Upload: ${progress}%`);
+   * });
+   * console.log('Media Object ID:', result.mediaObjectId);
+   */
+  async uploadPhotoDirect(
+    userId: string,
+    file: File,
+    onProgress?: (progress: number) => void
+  ): Promise<DirectUploadResponse> {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('userId', userId);
+      formData.append('file', file);
+
+      const xhr = new XMLHttpRequest();
+
+      // Track upload progress
+      if (onProgress) {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            onProgress(percentComplete);
+          }
+        });
+      }
+
+      // Handle completion
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            resolve(response);
+          } catch (error) {
+            reject(new Error('Failed to parse server response'));
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText);
+            reject(new Error(error.message || `Upload failed with status ${xhr.status}`));
+          } catch {
+            reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
+          }
+        }
+      });
+
+      // Handle errors
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error during upload'));
+      });
+
+      xhr.addEventListener('abort', () => {
+        reject(new Error('Upload aborted'));
+      });
+
+      // Send request
+      xhr.open('POST', `${this.base}/upload/photo`);
+      xhr.send(formData);
     });
   }
 }

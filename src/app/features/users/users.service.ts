@@ -29,7 +29,8 @@ export interface CreateUserBody {
   role: string;
   password: string;
   dateOfBirth?: string; // ISO date string (YYYY-MM-DD)
-  photoKey?: string;    // S3 key for avatar photo
+  photoKey?: string;    // S3 key for avatar photo (deprecated, use photoMediaId)
+  photoMediaId?: string; // UUID of MediaObject for avatar photo
   classId?: string;     // Required only for STUDENT role
 }
 
@@ -42,7 +43,8 @@ export interface UpdateUserBody {
   role?: string;
   status?: string;     // ACTIVE or INACTIVE
   dateOfBirth?: string; // ISO date string (YYYY-MM-DD)
-  photoKey?: string;    // S3 key for avatar photo
+  photoKey?: string;    // S3 key for avatar photo (deprecated, use photoMediaId)
+  photoMediaId?: string; // UUID of MediaObject for avatar photo
   classId?: string;     // Required only for STUDENT role
 }
 
@@ -79,6 +81,7 @@ export interface StudentCardDto {
   isActive: boolean;
   status: string;
   photoKey?: string; // S3 key for avatar photo
+  photoUrl?: string | null; // Presigned URL for avatar photo
   schoolClass: SchoolClassInfo;
   attendanceStats: AttendanceStats;
 }

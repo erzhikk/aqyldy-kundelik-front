@@ -52,13 +52,14 @@ export class UserEditComponent implements OnInit {
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: UserDto) {
     // Form with validation, pre-filled with existing user data
-    // Only editable fields: fullName, role, status, dateOfBirth, photoKey, classId (for students)
+    // Only editable fields: fullName, role, status, dateOfBirth, photoKey, photoMediaId, classId (for students)
     this.form = this.fb.group({
       fullName: [data.fullName, [Validators.required, Validators.minLength(2)]],
       role: [data.role, [Validators.required]],
       status: [data.status, [Validators.required]],
       dateOfBirth: [data.dateOfBirth || ''],
-      photoKey: [data.photoKey || ''],  // S3 key for avatar photo
+      photoKey: [data.photoKey || ''],  // S3 key for avatar photo (for display)
+      photoMediaId: [''],  // UUID of MediaObject for avatar photo (for update)
       classId: [data.classDto?.id || '']
     });
   }
@@ -103,8 +104,11 @@ export class UserEditComponent implements OnInit {
   /**
    * Handle successful avatar upload
    */
-  onAvatarUploaded(s3Key: string): void {
-    this.form.patchValue({ photoKey: s3Key });
+  onAvatarUploaded(result: { s3Key: string; mediaObjectId: string }): void {
+    this.form.patchValue({
+      photoKey: result.s3Key,
+      photoMediaId: result.mediaObjectId
+    });
     this.snackBar.open('Аватар успешно загружен', 'OK', { duration: 3000 });
   }
 
@@ -134,9 +138,9 @@ export class UserEditComponent implements OnInit {
       body.dateOfBirth = formValue.dateOfBirth;
     }
 
-    // Only include photoKey if it's set
-    if (formValue.photoKey) {
-      body.photoKey = formValue.photoKey;
+    // Include photoMediaId if it's set (new uploads)
+    if (formValue.photoMediaId) {
+      body.photoMediaId = formValue.photoMediaId;
     }
 
     // Only include classId if it's set (for students)

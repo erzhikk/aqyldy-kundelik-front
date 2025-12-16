@@ -60,7 +60,8 @@ export class UserCreateComponent implements OnInit {
     role: ['TEACHER', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     dateOfBirth: [''],
-    photoKey: [''],  // S3 key for avatar photo
+    photoKey: [''],  // S3 key for avatar photo (for display)
+    photoMediaId: [''],  // UUID of MediaObject for avatar photo (for create)
     classId: ['']
   });
 
@@ -99,8 +100,11 @@ export class UserCreateComponent implements OnInit {
   /**
    * Handle successful avatar upload
    */
-  onAvatarUploaded(s3Key: string): void {
-    this.form.patchValue({ photoKey: s3Key });
+  onAvatarUploaded(result: { s3Key: string; mediaObjectId: string }): void {
+    this.form.patchValue({
+      photoKey: result.s3Key,
+      photoMediaId: result.mediaObjectId
+    });
     this.snackBar.open('Аватар успешно загружен', 'OK', { duration: 3000 });
   }
 
@@ -131,9 +135,9 @@ export class UserCreateComponent implements OnInit {
       body.dateOfBirth = formValue.dateOfBirth;
     }
 
-    // Only include photoKey if it's set
-    if (formValue.photoKey) {
-      body.photoKey = formValue.photoKey;
+    // Include photoMediaId if it's set (new uploads)
+    if (formValue.photoMediaId) {
+      body.photoMediaId = formValue.photoMediaId;
     }
 
     // Only include classId if it's set (for students)

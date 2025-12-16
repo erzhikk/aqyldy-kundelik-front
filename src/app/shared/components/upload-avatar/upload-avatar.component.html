@@ -93,13 +93,7 @@
     <!-- Uploading -->
     <p *ngIf="status() === 'uploading'" class="info-message">
       <mat-icon>cloud_upload</mat-icon>
-      Загрузка {{ progress() }}%
-    </p>
-
-    <!-- Reconciling -->
-    <p *ngIf="status() === 'reconciling'" class="info-message">
-      <mat-icon>verified</mat-icon>
-      Валидация изображения на сервере...
+      Загрузка и валидация {{ progress() }}%
     </p>
 
     <!-- Success -->

@@ -53,21 +53,18 @@ export class StudentCardComponent implements OnInit {
   private _error = signal<string | null>(null);
   error = computed(() => this._error());
 
+  // Avatar handling
+  defaultAvatar = '/assets/avatar-default.svg';
+  private broken = signal(false);
+
   constructor() {
-    // Debug avatar URL when student loads
+    // Reset broken flag when student changes
     effect(() => {
       const studentData = this.student();
       if (studentData) {
-        console.log('=== Avatar Debug ===');
-        console.log('PhotoKey:', studentData.photoKey);
-        if (studentData.photoKey) {
-          const avatarUrl = this.imgproxyService.presetUrl(studentData.photoKey, 'avatar');
-          console.log('Generated avatar URL:', avatarUrl);
-        } else {
-          console.log('No photoKey - will show default avatar');
-        }
+        this.broken.set(false); // Reset error flag on new student
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -89,8 +86,6 @@ export class StudentCardComponent implements OnInit {
 
     this.api.getStudentCard(studentId).subscribe({
       next: (data) => {
-        console.log('Student card data:', data);
-        console.log('Student photoKey:', data.photoKey);
         this._student.set(data);
         this._loading.set(false);
       },
@@ -137,5 +132,20 @@ export class StudentCardComponent implements OnInit {
    */
   getPercentage(value: number, total: number): number {
     return total > 0 ? (value / total) * 100 : 0;
+  }
+
+  /**
+   * Get photo source with fallback logic
+   */
+  photoSrc(): string {
+    const url = this.student()?.photoUrl;
+    return (!this.broken() && url) ? url : this.defaultAvatar;
+  }
+
+  /**
+   * Handle image load error
+   */
+  onImgError(): void {
+    this.broken.set(true);
   }
 }

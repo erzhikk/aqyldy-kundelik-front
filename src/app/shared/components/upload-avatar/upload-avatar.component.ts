@@ -12,7 +12,7 @@ import { environment } from '../../../../environments/environment';
 /**
  * Upload state type
  */
-type UploadStatus = 'idle' | 'validating' | 'uploading' | 'reconciling' | 'success' | 'error';
+type UploadStatus = 'idle' | 'validating' | 'uploading' | 'success' | 'error';
 
 /**
  * Upload Avatar Component
@@ -21,9 +21,9 @@ type UploadStatus = 'idle' | 'validating' | 'uploading' | 'reconciling' | 'succe
  * 1. File selection with validation
  * 2. Client-side validation (size, type, dimensions)
  * 3. Preview of selected image
- * 4. Upload to MinIO via presigned URL
- * 5. Server-side validation (reconcile)
- * 6. Progress indication and status messages
+ * 4. Direct upload to backend (backend handles MinIO upload)
+ * 5. Progress indication and status messages
+ * 6. Returns mediaObjectId for linking to user
  *
  * @example
  * <app-upload-avatar
@@ -65,9 +65,9 @@ export class UploadAvatarComponent {
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
 
   /**
-   * Emits S3 key when upload succeeds
+   * Emits upload result when upload succeeds
    */
-  @Output() uploadSuccess = new EventEmitter<string>();
+  @Output() uploadSuccess = new EventEmitter<{ s3Key: string; mediaObjectId: string }>();
 
   /**
    * Emits error message when upload fails
@@ -162,7 +162,7 @@ export class UploadAvatarComponent {
   }
 
   /**
-   * Upload selected file
+   * Upload selected file using direct upload (through backend)
    */
   async upload(): Promise<void> {
     const file = this._file();
@@ -174,52 +174,25 @@ export class UploadAvatarComponent {
       this._progress.set(0);
       this._errorMessage.set(null);
 
-      // 1. Get presigned URL
-      console.log('Getting presigned URL...');
-      const presignResponse = await this.mediaService.getPresignedUrl({
-        userId: this.userId,
-        contentType: file.type,
-        filename: file.name
-      });
-
-      console.log('Presigned URL obtained:', presignResponse.key);
-
-      // 2. Upload to MinIO
-      this._progress.set(25);
-      console.log('Uploading to MinIO...');
-
-      await this.mediaService.uploadToMinio(
-        presignResponse.url,
+      // Upload directly through backend (bypasses CORS)
+      const result = await this.mediaService.uploadPhotoDirect(
+        this.userId,
         file,
-        file.type,
         (progress) => {
-          // Map 0-100 to 25-75
-          this._progress.set(25 + Math.floor(progress * 0.5));
+          this._progress.set(progress);
         }
       );
 
-      console.log('Upload to MinIO complete');
-
-      // 3. Reconcile (validate on server)
-      this._status.set('reconciling');
-      this._progress.set(75);
-      console.log('Reconciling...');
-
-      const reconcileResult = await this.mediaService.reconcile(presignResponse.key);
-
-      if (!reconcileResult.success) {
-        throw new Error(reconcileResult.reason || 'Ошибка валидации изображения на сервере');
-      }
-
-      console.log('Reconcile successful');
-
-      // 4. Success
+      // Success
       this._status.set('success');
       this._progress.set(100);
-      this._uploadedKey.set(presignResponse.key);
+      this._uploadedKey.set(result.key);
 
-      // Emit success event
-      this.uploadSuccess.emit(presignResponse.key);
+      // Emit success event with both s3Key and mediaObjectId
+      this.uploadSuccess.emit({
+        s3Key: result.key,
+        mediaObjectId: result.mediaObjectId
+      });
 
       // Clear file after successful upload
       setTimeout(() => {
@@ -228,7 +201,6 @@ export class UploadAvatarComponent {
       }, 2000);
 
     } catch (error: any) {
-      console.error('Upload error:', error);
       this.showError(error.message || 'Ошибка загрузки файла');
       this.uploadError.emit(this._errorMessage()!);
     } finally {
