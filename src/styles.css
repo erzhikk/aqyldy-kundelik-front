@@ -1,1 +1,64 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Material Theme */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Prevent layout shift when scrollbar appears/disappears */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Custom dialog styles */
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.custom-dialog-container .mat-mdc-dialog-container {
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 0;
+}
+
+.custom-dialog-container .mat-mdc-dialog-surface {
+  border-radius: 12px;
+}
+
+/* Dialog title styling */
+.mat-mdc-dialog-title {
+  padding: 1.5rem 1.5rem 1rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Fix dialog centering */
+.cdk-global-overlay-wrapper {
+  display: flex;
+  position: absolute;
+  z-index: 1000;
+  overflow: auto;
+  pointer-events: auto;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-mdc-dialog-container {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+}

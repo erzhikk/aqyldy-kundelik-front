@@ -1,0 +1,152 @@
+<div class="staff-card-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading staff information...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error()" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to List
+    </button>
+  </div>
+
+  <!-- Staff Card -->
+  <div *ngIf="!loading() && !error() && staff()" class="card-content">
+    <!-- Header with Back Button -->
+    <div class="card-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Staff Profile</h1>
+    </div>
+
+    <!-- Personal Information Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <img
+          mat-card-avatar
+          [appLazyImage]="staff()?.photoKey | imgproxy: 'avatar'"
+          [fallback]="'/assets/images/default-avatar.svg'"
+          [alt]="staff()?.fullName"
+          class="avatar-image"
+        />
+        <mat-card-title>{{ staff()?.fullName }}</mat-card-title>
+        <mat-card-subtitle>{{ staff()?.email }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="info-grid">
+          <!-- Role -->
+          <div class="info-item">
+            <mat-icon>badge</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Role</span>
+              <mat-chip-set>
+                <mat-chip [color]="getRoleColor(staff()?.role || '')" highlighted>
+                  {{ staff()?.role }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="info-item">
+            <mat-icon>info</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Status</span>
+              <mat-chip-set>
+                <mat-chip [color]="getStatusColor(staff()?.status || '')" highlighted>
+                  {{ staff()?.status }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+
+          <!-- Active Status -->
+          <div class="info-item">
+            <mat-icon>{{ staff()?.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Account Active</span>
+              <span class="info-value">{{ staff()?.isActive ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Class Teacher Card -->
+    <mat-card class="info-card" *ngIf="staff()?.classAsTeacher">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="class-teacher-icon">school</mat-icon>
+        <mat-card-title>Class Teacher</mat-card-title>
+        <mat-card-subtitle>Homeroom responsibility</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="class-teacher-info">
+          <div class="class-badge">
+            <mat-icon>class</mat-icon>
+            <span class="class-code">{{ staff()!.classAsTeacher!.code }}</span>
+          </div>
+          <div class="class-details">
+            <div class="detail-item">
+              <mat-icon>language</mat-icon>
+              <span class="detail-label">Language Type:</span>
+              <mat-chip-set>
+                <mat-chip highlighted>{{ staff()!.classAsTeacher!.langType }}</mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Taught Subjects Card -->
+    <mat-card class="info-card" *ngIf="staff() && staff()!.taughtSubjects.length > 0">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="subjects-icon">menu_book</mat-icon>
+        <mat-card-title>Taught Subjects</mat-card-title>
+        <mat-card-subtitle>{{ staff()!.taughtSubjects.length }} subject(s)</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-accordion class="subjects-accordion">
+          <mat-expansion-panel *ngFor="let subject of staff()?.taughtSubjects; let i = index">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon>book</mat-icon>
+                <span class="subject-name">{{ subject.subjectName }}</span>
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ subject.groups.length }} group(s)
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="groups-container">
+              <h4>Teaching Groups:</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let group of subject.groups" class="group-chip">
+                  <mat-icon>group</mat-icon>
+                  {{ group }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- No Subjects Message -->
+    <mat-card class="info-card empty-state" *ngIf="staff() && staff()!.taughtSubjects.length === 0">
+      <mat-card-content>
+        <mat-icon>info</mat-icon>
+        <p>This staff member is not currently teaching any subjects.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

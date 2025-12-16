@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>Edit Subject</h2>
+<mat-dialog-content>
+  <!-- Read-only fields -->
+  <div class="read-only-section">
+    <div class="read-only-field">
+      <span class="label">ID:</span>
+      <span class="value">{{ data.id }}</span>
+    </div>
+  </div>
+
+  <!-- Editable fields -->
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Subject Name (Russian)</mat-label>
+        <input matInput formControlName="nameRu" required placeholder="Например, Математика">
+        @if (form.get('nameRu')?.invalid && form.get('nameRu')?.touched) {
+          <mat-error>Subject name in Russian is required (min 2 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Subject Name (Kazakh)</mat-label>
+        <input matInput formControlName="nameKk" required placeholder="Мысалы, Математика">
+        @if (form.get('nameKk')?.invalid && form.get('nameKk')?.touched) {
+          <mat-error>Subject name in Kazakh is required (min 2 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Subject Name (English)</mat-label>
+        <input matInput formControlName="nameEn" required placeholder="e.g., Mathematics">
+        @if (form.get('nameEn')?.invalid && form.get('nameEn')?.touched) {
+          <mat-error>Subject name in English is required (min 2 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Class Level</mat-label>
+        <mat-select formControlName="classLevelId" required>
+          @for (level of classLevels; track level.id) {
+            <mat-option [value]="level.id">{{ level.nameRu }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('classLevelId')?.invalid && form.get('classLevelId')?.touched) {
+          <mat-error>Class level is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? 'Saving...' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>

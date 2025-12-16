@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm start)",
+      "Bash(timeout:*)",
+      "Bash(mkdir -p src/app/features/users/list src/app/features/users/create src/app/features/users/edit)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

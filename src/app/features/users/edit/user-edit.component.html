@@ -1,0 +1,83 @@
+<h2 mat-dialog-title>Edit User</h2>
+<mat-dialog-content>
+  <!-- Read-only fields -->
+  <div class="read-only-section">
+    <div class="read-only-field">
+      <span class="label">Email:</span>
+      <span class="value">{{ data.email }}</span>
+    </div>
+  </div>
+
+  <!-- Avatar Upload Section -->
+  <div class="avatar-section">
+    <app-upload-avatar
+      [userId]="data.id"
+      [currentAvatarKey]="form.get('photoKey')?.value"
+      [size]="'medium'"
+      (uploadSuccess)="onAvatarUploaded($event)"
+      (uploadError)="onAvatarError($event)"
+    ></app-upload-avatar>
+  </div>
+
+  <!-- Editable fields -->
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Full Name</mat-label>
+        <input matInput formControlName="fullName" required>
+        @if (form.get('fullName')?.invalid && form.get('fullName')?.touched) {
+          <mat-error>Name must be at least 2 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role" required>
+          @for (r of roles; track r) {
+            <mat-option [value]="r">{{ r }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('role')?.invalid && form.get('role')?.touched) {
+          <mat-error>Role is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status" required>
+          <mat-option value="ACTIVE">ACTIVE</mat-option>
+          <mat-option value="INACTIVE">INACTIVE</mat-option>
+        </mat-select>
+        @if (form.get('status')?.invalid && form.get('status')?.touched) {
+          <mat-error>Status is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date of Birth</mat-label>
+        <input matInput type="date" formControlName="dateOfBirth">
+      </mat-form-field>
+
+      @if (isStudent()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Class</mat-label>
+          <mat-select formControlName="classId" required>
+            @for (c of classes; track c.id) {
+              <mat-option [value]="c.id">{{ c.code }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('classId')?.invalid && form.get('classId')?.touched) {
+            <mat-error>Class is required for students</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? 'Saving...' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>

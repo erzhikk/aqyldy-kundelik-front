@@ -1,0 +1,73 @@
+{
+  "COMMON": {
+    "ACTIONS": "Actions",
+    "CANCEL": "Cancel",
+    "SAVE": "Save",
+    "CREATE": "Create",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "CLOSE": "Close",
+    "SEARCH": "Search",
+    "NAME": "Name",
+    "LEVEL": "Level",
+    "SAVING": "Saving...",
+    "CREATING": "Creating...",
+    "LOADING": "Loading..."
+  },
+  "NAV": {
+    "DASHBOARD": "Dashboard",
+    "USERS": "Users",
+    "STUDENTS": "Students",
+    "STAFF": "Staff",
+    "CLASSES": "Classes",
+    "SUBJECTS": "Subjects",
+    "TIMETABLE": "Timetable",
+    "ATTENDANCE": "Attendance"
+  },
+  "AUTH": {
+    "LOGIN": "Login",
+    "LOGOUT": "Logout",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "WELCOME": "Welcome"
+  },
+  "USERS": {
+    "TITLE": "Users",
+    "CREATE": "Create User",
+    "EDIT": "Edit User",
+    "FULL_NAME": "Full Name",
+    "EMAIL": "Email",
+    "ROLE": "Role",
+    "STATUS": "Status",
+    "CLASS": "Class",
+    "NO_USERS": "No users found"
+  },
+  "CLASSES": {
+    "TITLE": "Classes",
+    "CREATE": "Create Class",
+    "EDIT": "Edit Class",
+    "CODE": "Code",
+    "TEACHER": "Class Teacher",
+    "LANG_TYPE": "Language",
+    "NO_CLASSES": "No classes found"
+  },
+  "SUBJECTS": {
+    "TITLE": "Subjects",
+    "CREATE": "Create Subject",
+    "EDIT": "Edit Subject",
+    "NAME_RU": "Name (Russian)",
+    "NAME_KK": "Name (Kazakh)",
+    "NAME_EN": "Name (English)",
+    "CLASS_LEVEL": "Class Level",
+    "NO_SUBJECTS": "No subjects found",
+    "SAVE_CHANGES": "Save Changes"
+  },
+  "VALIDATION": {
+    "REQUIRED": "This field is required",
+    "MIN_LENGTH": "Minimum length: {{length}} characters",
+    "MAX_LENGTH": "Maximum length: {{length}} characters",
+    "EMAIL": "Please enter a valid email",
+    "MIN": "Minimum value: {{min}}",
+    "MAX": "Maximum value: {{max}}"
+  }
+}

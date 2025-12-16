@@ -1,0 +1,79 @@
+<h2 mat-dialog-title>Create User</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Avatar Upload Section -->
+    <div class="avatar-section">
+      <app-upload-avatar
+        [userId]="temporaryUserId"
+        [currentAvatarKey]="form.get('photoKey')?.value || undefined"
+        [size]="'medium'"
+        (uploadSuccess)="onAvatarUploaded($event)"
+        (uploadError)="onAvatarError($event)"
+      ></app-upload-avatar>
+    </div>
+
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" required>
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <mat-error>Valid email is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Full Name</mat-label>
+        <input matInput formControlName="fullName" required>
+        @if (form.get('fullName')?.invalid && form.get('fullName')?.touched) {
+          <mat-error>Name must be at least 2 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" required>
+        @if (form.get('password')?.invalid && form.get('password')?.touched) {
+          <mat-error>Password must be at least 6 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date of Birth</mat-label>
+        <input matInput type="date" formControlName="dateOfBirth">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role" required>
+          @for (r of roles; track r) {
+            <mat-option [value]="r">{{ r }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('role')?.invalid && form.get('role')?.touched) {
+          <mat-error>Role is required</mat-error>
+        }
+      </mat-form-field>
+
+      @if (isStudent()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Class</mat-label>
+          <mat-select formControlName="classId" required>
+            @for (c of classes; track c.id) {
+              <mat-option [value]="c.id">{{ c.code }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('classId')?.invalid && form.get('classId')?.touched) {
+            <mat-error>Class is required for students</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? 'Creating...' : 'Create User' }}
+  </button>
+</mat-dialog-actions>

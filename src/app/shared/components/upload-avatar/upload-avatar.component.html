@@ -1,0 +1,128 @@
+<div class="upload-avatar" [class.size-small]="size === 'small'" [class.size-medium]="size === 'medium'" [class.size-large]="size === 'large'">
+  <!-- Avatar Preview -->
+  <div class="avatar-preview">
+    <!-- Image -->
+    <img
+      *ngIf="getAvatarPreviewUrl()"
+      [src]="getAvatarPreviewUrl()!"
+      alt="Avatar preview"
+      class="avatar-image"
+    />
+
+    <!-- Placeholder when no image -->
+    <div *ngIf="!getAvatarPreviewUrl()" class="avatar-placeholder">
+      <mat-icon>person</mat-icon>
+    </div>
+
+    <!-- Upload overlay -->
+    <div *ngIf="uploading()" class="upload-overlay">
+      <mat-spinner diameter="40" color="accent"></mat-spinner>
+      <span class="progress-text">{{ progress() }}%</span>
+    </div>
+
+    <!-- Success checkmark -->
+    <div *ngIf="status() === 'success'" class="success-overlay">
+      <mat-icon class="success-icon">check_circle</mat-icon>
+    </div>
+  </div>
+
+  <!-- File input (hidden) -->
+  <input
+    #fileInput
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    (change)="onFileSelected($event)"
+    style="display: none"
+  />
+
+  <!-- Action buttons -->
+  <div class="actions">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="fileInput.click()"
+      [disabled]="uploading()"
+    >
+      <mat-icon>add_photo_alternate</mat-icon>
+      Выбрать фото
+    </button>
+
+    <button
+      *ngIf="file()"
+      mat-raised-button
+      color="accent"
+      (click)="upload()"
+      [disabled]="uploading()"
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      Загрузить
+    </button>
+
+    <button
+      *ngIf="file() && !uploading()"
+      mat-button
+      (click)="cancel()"
+    >
+      <mat-icon>cancel</mat-icon>
+      Отмена
+    </button>
+  </div>
+
+  <!-- Progress bar -->
+  <mat-progress-bar
+    *ngIf="uploading()"
+    mode="determinate"
+    [value]="progress()"
+    color="accent"
+  ></mat-progress-bar>
+
+  <!-- Status messages -->
+  <div class="status-messages">
+    <!-- File info -->
+    <p *ngIf="file() && status() === 'idle'" class="info-message">
+      <mat-icon>info</mat-icon>
+      {{ file()!.name }} ({{ (file()!.size / 1024 / 1024).toFixed(2) }} МБ)
+    </p>
+
+    <!-- Validating -->
+    <p *ngIf="status() === 'validating'" class="info-message">
+      <mat-icon>hourglass_empty</mat-icon>
+      Проверка изображения...
+    </p>
+
+    <!-- Uploading -->
+    <p *ngIf="status() === 'uploading'" class="info-message">
+      <mat-icon>cloud_upload</mat-icon>
+      Загрузка {{ progress() }}%
+    </p>
+
+    <!-- Reconciling -->
+    <p *ngIf="status() === 'reconciling'" class="info-message">
+      <mat-icon>verified</mat-icon>
+      Валидация изображения на сервере...
+    </p>
+
+    <!-- Success -->
+    <p *ngIf="status() === 'success'" class="success-message">
+      <mat-icon>check_circle</mat-icon>
+      Изображение успешно загружено
+    </p>
+
+    <!-- Error -->
+    <p *ngIf="status() === 'error'" class="error-message">
+      <mat-icon>error</mat-icon>
+      {{ errorMessage() }}
+    </p>
+  </div>
+
+  <!-- Upload requirements hint -->
+  <div class="requirements" *ngIf="!file() && status() === 'idle'">
+    <p class="requirements-title">Требования к файлу:</p>
+    <ul>
+      <li>Формат: JPEG, PNG или WebP</li>
+      <li>Размер: до 5 МБ</li>
+      <li>Разрешение: от 256×256 до 4000×4000 пикселей</li>
+      <li>Только статические изображения</li>
+    </ul>
+  </div>
+</div>

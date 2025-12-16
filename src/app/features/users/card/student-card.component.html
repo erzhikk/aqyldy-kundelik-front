@@ -1,0 +1,191 @@
+<div class="student-card-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading student information...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error()" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to List
+    </button>
+  </div>
+
+  <!-- Student Card -->
+  <div *ngIf="!loading() && !error() && student()" class="card-content">
+    <!-- Header with Back Button -->
+    <div class="card-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Student Profile</h1>
+    </div>
+
+    <!-- Personal Information Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <img
+          mat-card-avatar
+          [appLazyImage]="student()?.photoKey | imgproxy: 'avatar'"
+          [fallback]="'/assets/images/default-avatar.svg'"
+          [alt]="student()?.fullName"
+          class="avatar-image"
+        />
+        <mat-card-title>{{ student()?.fullName }}</mat-card-title>
+        <mat-card-subtitle>{{ student()?.email }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="info-grid">
+          <!-- Status -->
+          <div class="info-item">
+            <mat-icon>info</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Status</span>
+              <mat-chip-set>
+                <mat-chip [color]="getStatusColor(student()?.status || '')" highlighted>
+                  {{ student()?.status }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="info-item">
+            <mat-icon>cake</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Date of Birth</span>
+              <span class="info-value">{{ student()?.dateOfBirth | date:'longDate' }}</span>
+            </div>
+          </div>
+
+          <!-- Active Status -->
+          <div class="info-item">
+            <mat-icon>{{ student()?.isActive ? 'check_circle' : 'cancel' }}</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Account Active</span>
+              <span class="info-value">{{ student()?.isActive ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Class Information Card -->
+    <mat-card class="info-card" *ngIf="student()?.schoolClass">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>school</mat-icon>
+        <mat-card-title>Class Information</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="info-grid">
+          <!-- Class Code -->
+          <div class="info-item">
+            <mat-icon>class</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Class</span>
+              <span class="info-value class-code">{{ student()!.schoolClass.code }}</span>
+            </div>
+          </div>
+
+          <!-- Language Type -->
+          <div class="info-item">
+            <mat-icon>language</mat-icon>
+            <div class="info-details">
+              <span class="info-label">Language Type</span>
+              <mat-chip-set>
+                <mat-chip highlighted>{{ student()!.schoolClass.langType }}</mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Attendance Statistics Card -->
+    <mat-card class="info-card" *ngIf="student()?.attendanceStats">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>event_available</mat-icon>
+        <mat-card-title>Attendance Statistics</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Attendance Rate Circle -->
+        <div class="attendance-rate-container">
+          <div class="attendance-circle"
+               [style.border-color]="getAttendanceRateColor(student()!.attendanceStats.attendanceRate)">
+            <div class="attendance-percentage">
+              {{ student()!.attendanceStats.attendanceRate.toFixed(1) }}%
+            </div>
+            <div class="attendance-label">Attendance Rate</div>
+          </div>
+        </div>
+
+        <!-- Attendance Details -->
+        <div class="attendance-grid">
+          <!-- Total Lessons -->
+          <div class="attendance-stat total">
+            <mat-icon>menu_book</mat-icon>
+            <div class="stat-details">
+              <span class="stat-value">{{ student()!.attendanceStats.totalLessons }}</span>
+              <span class="stat-label">Total Lessons</span>
+            </div>
+          </div>
+
+          <!-- Present -->
+          <div class="attendance-stat present">
+            <mat-icon>check_circle</mat-icon>
+            <div class="stat-details">
+              <span class="stat-value">{{ student()!.attendanceStats.present }}</span>
+              <span class="stat-label">Present</span>
+              <span class="stat-percentage">
+                {{ getPercentage(student()!.attendanceStats.present, student()!.attendanceStats.totalLessons).toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Late -->
+          <div class="attendance-stat late">
+            <mat-icon>schedule</mat-icon>
+            <div class="stat-details">
+              <span class="stat-value">{{ student()!.attendanceStats.late }}</span>
+              <span class="stat-label">Late</span>
+              <span class="stat-percentage">
+                {{ getPercentage(student()!.attendanceStats.late, student()!.attendanceStats.totalLessons).toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Absent -->
+          <div class="attendance-stat absent">
+            <mat-icon>cancel</mat-icon>
+            <div class="stat-details">
+              <span class="stat-value">{{ student()!.attendanceStats.absent }}</span>
+              <span class="stat-label">Absent</span>
+              <span class="stat-percentage">
+                {{ getPercentage(student()!.attendanceStats.absent, student()!.attendanceStats.totalLessons).toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Excused -->
+          <div class="attendance-stat excused">
+            <mat-icon>event_busy</mat-icon>
+            <div class="stat-details">
+              <span class="stat-value">{{ student()!.attendanceStats.excused }}</span>
+              <span class="stat-label">Excused</span>
+              <span class="stat-percentage">
+                {{ getPercentage(student()!.attendanceStats.excused, student()!.attendanceStats.totalLessons).toFixed(1) }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

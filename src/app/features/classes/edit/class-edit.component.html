@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Edit Class</h2>
+<mat-dialog-content>
+  <!-- Read-only fields -->
+  <div class="read-only-section">
+    <div class="read-only-field">
+      <span class="label">ID:</span>
+      <span class="value">{{ data.id }}</span>
+    </div>
+  </div>
+
+  <!-- Editable fields -->
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Class Code</mat-label>
+        <input matInput formControlName="code" required maxlength="3">
+        @if (form.get('code')?.invalid && form.get('code')?.touched) {
+          <mat-error>Class code is required (max 3 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Language Type</mat-label>
+        <mat-select formControlName="langType" required>
+          @for (lang of langOptions; track lang) {
+            <mat-option [value]="lang">{{ lang.toUpperCase() }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('langType')?.invalid && form.get('langType')?.touched) {
+          <mat-error>Language type is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Class Teacher (optional)</mat-label>
+        <mat-select formControlName="classTeacherId">
+          <mat-option [value]="''">None</mat-option>
+          @for (teacher of teachers; track teacher.id) {
+            <mat-option [value]="teacher.id">{{ teacher.fullName }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? 'Saving...' : 'Save Changes' }}
+  </button>
+</mat-dialog-actions>
