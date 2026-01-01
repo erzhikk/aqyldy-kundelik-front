@@ -48,6 +48,30 @@ export const routes: Routes = [
       {
         path: 'attendance',
         loadComponent: () => import('./features/attendance/list/attendance-list.component').then(m => m.AttendanceListComponent)
+      },
+      {
+        path: 'assess/tests',
+        loadComponent: () => import('./features/assess/tests/list/tests-list.component').then(m => m.TestsListComponent)
+      },
+      {
+        path: 'assess/tests/new',
+        loadComponent: () => import('./features/assess/tests/form/test-form.component').then(m => m.TestFormComponent)
+      },
+      {
+        path: 'assess/tests/:id/edit',
+        loadComponent: () => import('./features/assess/tests/form/test-form.component').then(m => m.TestFormComponent)
+      },
+      {
+        path: 'assess/tests/:id/composition',
+        loadComponent: () => import('./features/assess/tests/composition/test-composition.component').then(m => m.TestCompositionComponent)
+      },
+      {
+        path: 'tests/:id/start',
+        loadComponent: () => import('./features/assess/taking/test-taking.component').then(m => m.TestTakingComponent)
+      },
+      {
+        path: 'attempts/:attemptId/result',
+        loadComponent: () => import('./features/assess/taking/test-result.component').then(m => m.TestResultComponent)
       }
     ]
   },

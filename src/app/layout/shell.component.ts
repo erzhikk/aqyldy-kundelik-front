@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -148,12 +149,31 @@ type MenuItem = {
     }
   `]
 })
-export class ShellComponent {
+export class ShellComponent implements OnInit {
   private tokens = inject(TokenStorage);
+  private breakpointObserver = inject(BreakpointObserver);
   loader = inject(LoadingService);
 
-  // Sidenav state (desktop: open, mobile: can toggle)
+  // Mobile detection
+  private _isMobile = signal(false);
+  isMobile = computed(() => this._isMobile());
+
+  // Sidenav state and mode
   sidenavOpened = signal(true);
+  sidenavMode = computed(() => this.isMobile() ? 'over' : 'side');
+
+  ngOnInit(): void {
+    // Detect mobile devices
+    this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
+      this._isMobile.set(result.matches);
+      // On mobile, close sidenav by default
+      if (result.matches) {
+        this.sidenavOpened.set(false);
+      } else {
+        this.sidenavOpened.set(true);
+      }
+    });
+  }
 
   /**
    * Menu items with optional role-based visibility
@@ -200,6 +220,12 @@ export class ShellComponent {
       label: 'NAV.ATTENDANCE',
       icon: 'check_circle',
       roles: ['TEACHER', 'ADMIN', 'SUPER_ADMIN']
+    },
+    {
+      path: '/app/assess/tests',
+      label: 'NAV.TESTS',
+      icon: 'assignment',
+      roles: ['TEACHER', 'ADMIN', 'SUPER_ADMIN', 'ADMIN_ASSESSMENT']
     }
   ];
 

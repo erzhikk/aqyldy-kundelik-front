@@ -109,6 +109,8 @@ export class UserEditComponent implements OnInit {
       photoKey: result.s3Key,
       photoMediaId: result.mediaObjectId
     });
+    // Update data object so UploadAvatarComponent can display new photo
+    this.data.photoKey = result.s3Key;
     this.snackBar.open('Аватар успешно загружен', 'OK', { duration: 3000 });
   }
 

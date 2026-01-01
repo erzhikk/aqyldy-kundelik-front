@@ -22,7 +22,8 @@
     "CLASSES": "Классы",
     "SUBJECTS": "Предметы",
     "TIMETABLE": "Расписание",
-    "ATTENDANCE": "Посещаемость"
+    "ATTENDANCE": "Посещаемость",
+    "TESTS": "Тесты"
   },
   "AUTH": {
     "LOGIN": "Войти",

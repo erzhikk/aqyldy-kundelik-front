@@ -1,8 +1,9 @@
 <mat-sidenav-container class="h-screen">
   <!-- Sidebar Navigation -->
   <mat-sidenav
-    [mode]="'side'"
+    [mode]="sidenavMode()"
     [opened]="sidenavOpened()"
+    (closed)="sidenavOpened.set(false)"
     class="w-64"
   >
     <!-- App Title -->

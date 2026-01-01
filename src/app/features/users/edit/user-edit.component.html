@@ -13,6 +13,7 @@
     <app-upload-avatar
       [userId]="data.id"
       [currentAvatarKey]="form.get('photoKey')?.value"
+      [currentAvatarUrl]="data.photoUrl"
       [size]="'medium'"
       (uploadSuccess)="onAvatarUploaded($event)"
       (uploadError)="onAvatarError($event)"

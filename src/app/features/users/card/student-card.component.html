@@ -28,15 +28,67 @@
     <!-- Personal Information Card -->
     <mat-card class="info-card">
       <mat-card-header>
-        <img
-          mat-card-avatar
-          [src]="photoSrc()"
-          (error)="onImgError()"
-          [alt]="student()?.fullName"
-          class="avatar-image"
-        />
-        <mat-card-title>{{ student()?.fullName }}</mat-card-title>
-        <mat-card-subtitle>{{ student()?.email }}</mat-card-subtitle>
+        <div class="avatar-section">
+          <div class="avatar-wrapper">
+            <img
+              mat-card-avatar
+              [src]="photoSrc()"
+              (error)="onImgError()"
+              [alt]="student()?.fullName"
+              class="avatar-image"
+              loading="lazy"
+            />
+            <!-- Mobile FAB -->
+            <button
+              *ngIf="isMobile()"
+              mat-fab
+              color="accent"
+              class="mobile-fab"
+              (click)="openActionsSheet()"
+              [disabled]="uploading()"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+          <!-- Desktop controls -->
+          <div class="photo-controls" *ngIf="!isMobile()">
+            <button
+              mat-mini-fab
+              color="primary"
+              (click)="fileInput.click()"
+              [disabled]="uploading()"
+              matTooltip="Upload photo"
+            >
+              <mat-icon>upload</mat-icon>
+            </button>
+            <button
+              mat-mini-fab
+              color="warn"
+              (click)="onRemovePhoto()"
+              [disabled]="uploading() || !student()?.photoUrl"
+              matTooltip="Remove photo"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <input
+            #fileInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
+          <mat-progress-bar
+            *ngIf="uploading()"
+            mode="determinate"
+            [value]="uploadProgress()"
+            class="upload-progress"
+          ></mat-progress-bar>
+        </div>
+        <div class="header-info">
+          <mat-card-title>{{ student()?.fullName }}</mat-card-title>
+          <mat-card-subtitle>{{ student()?.email }}</mat-card-subtitle>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
@@ -187,5 +239,8 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Topic Performance Widget -->
+    <app-student-topic-performance [studentId]="student()!.id"></app-student-topic-performance>
   </div>
 </div>

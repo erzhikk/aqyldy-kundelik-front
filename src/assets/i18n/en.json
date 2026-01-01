@@ -22,7 +22,8 @@
     "CLASSES": "Classes",
     "SUBJECTS": "Subjects",
     "TIMETABLE": "Timetable",
-    "ATTENDANCE": "Attendance"
+    "ATTENDANCE": "Attendance",
+    "TESTS": "Tests"
   },
   "AUTH": {
     "LOGIN": "Login",

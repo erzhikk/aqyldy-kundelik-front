@@ -17,6 +17,7 @@ export interface UserDto {
   isDeleted: boolean;
   dateOfBirth?: string; // ISO date string (YYYY-MM-DD)
   photoKey?: string;    // S3 key for avatar photo
+  photoUrl?: string | null; // Presigned URL for avatar photo
   classDto?: ClassDto
 }
 
@@ -106,6 +107,7 @@ export interface StaffCardDto {
   isActive: boolean;
   status: string;
   photoKey?: string; // S3 key for avatar photo
+  photoUrl?: string | null; // Presigned URL for avatar photo
   classAsTeacher?: SchoolClassInfo;
   taughtSubjects: TaughtSubject[];
 }
@@ -286,5 +288,15 @@ export class UsersService {
    */
   getStaffCard(staffId: string): Observable<StaffCardDto> {
     return this.http.get<StaffCardDto>(`${this.base}/staff/${staffId}/card`);
+  }
+
+  /**
+   * Delete user photo
+   * Requires ADMIN or SUPER_ADMIN role, or the user deleting their own photo
+   * @param userId User UUID
+   * @returns Observable of void
+   */
+  deletePhoto(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${userId}/photo`);
   }
 }

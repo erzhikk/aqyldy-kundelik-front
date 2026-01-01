@@ -29,6 +29,7 @@ type UploadStatus = 'idle' | 'validating' | 'uploading' | 'success' | 'error';
  * <app-upload-avatar
  *   [userId]="user.id"
  *   [currentAvatarKey]="user.photoKey"
+ *   [currentAvatarUrl]="user.photoUrl"
  *   [size]="'medium'"
  *   (uploadSuccess)="onAvatarUploaded($event)"
  *   (uploadError)="onAvatarError($event)"
@@ -58,6 +59,11 @@ export class UploadAvatarComponent {
    * Current avatar S3 key (for preview)
    */
   @Input() currentAvatarKey?: string;
+
+  /**
+   * Current avatar presigned URL (for preview)
+   */
+  @Input() currentAvatarUrl?: string | null;
 
   /**
    * Avatar preview size
@@ -212,13 +218,17 @@ export class UploadAvatarComponent {
    * Get preview URL for current or uploaded avatar
    */
   getAvatarPreviewUrl(): string | null {
-    // Priority: local preview > uploaded key > current key
+    // Priority: local preview > uploaded key > current URL > current key
     if (this._previewUrl()) {
       return this._previewUrl();
     }
 
     if (this._uploadedKey()) {
       return this.imgproxyService.presetUrl(this._uploadedKey()!, 'avatar');
+    }
+
+    if (this.currentAvatarUrl) {
+      return this.currentAvatarUrl;
     }
 
     if (this.currentAvatarKey) {
