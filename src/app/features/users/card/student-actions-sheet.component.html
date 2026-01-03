@@ -1,0 +1,31 @@
+<mat-nav-list>
+  <h3 matSubheader>Student Actions</h3>
+
+  <a mat-list-item (click)="selectAction('upload')">
+    <mat-icon matListItemIcon>upload</mat-icon>
+    <span matListItemTitle>Upload photo</span>
+  </a>
+
+  <a
+    mat-list-item
+    (click)="selectAction('remove')"
+    [class.disabled]="!data.hasPhoto"
+  >
+    <mat-icon matListItemIcon>delete</mat-icon>
+    <span matListItemTitle>Remove photo</span>
+  </a>
+
+  <mat-divider></mat-divider>
+
+  <a mat-list-item (click)="selectAction('edit')">
+    <mat-icon matListItemIcon>edit</mat-icon>
+    <span matListItemTitle>Edit student</span>
+  </a>
+
+  <mat-divider></mat-divider>
+
+  <a mat-list-item (click)="close()">
+    <mat-icon matListItemIcon>close</mat-icon>
+    <span matListItemTitle>Cancel</span>
+  </a>
+</mat-nav-list>

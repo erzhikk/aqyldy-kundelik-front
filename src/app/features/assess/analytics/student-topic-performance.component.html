@@ -1,0 +1,78 @@
+<mat-card class="topic-performance-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>analytics</mat-icon>
+      Topic Performance
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Filters -->
+    <div class="filters">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Subject</mat-label>
+        <mat-select [formControl]="subjectControl" placeholder="All Subjects">
+          <mat-option [value]="null">All Subjects</mat-option>
+          @for (subject of subjects(); track subject.id) {
+            <mat-option [value]="subject.id">{{ subject.nameEn }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Period</mat-label>
+        <mat-select [formControl]="periodControl">
+          @for (option of periodOptions; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-state">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+        <p>Loading performance data...</p>
+      </div>
+    }
+
+    <!-- Topics -->
+    @if (!loading() && topics().length > 0) {
+      <div class="topics-container">
+        @for (topic of topics(); track topic.topicId) {
+          <mat-chip-set class="topic-chip-set">
+            <mat-chip
+              [highlighted]="true"
+              [color]="getChipColor(topic.percentage)"
+              class="topic-chip"
+              [class.red-zone]="isRedZone(topic.percentage)"
+            >
+              <div class="chip-content">
+                <span class="topic-name">{{ topic.topicName }}</span>
+                <span class="topic-percentage">{{ topic.percentage }}%</span>
+              </div>
+              <div class="chip-details">
+                {{ topic.correctCount }} / {{ topic.totalCount }}
+                @if (isRedZone(topic.percentage)) {
+                  <mat-icon class="warning-icon">warning</mat-icon>
+                }
+              </div>
+            </mat-chip>
+          </mat-chip-set>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && topics().length === 0) {
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No performance data available</p>
+        <span class="empty-hint">
+          Try selecting a different subject or time period
+        </span>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

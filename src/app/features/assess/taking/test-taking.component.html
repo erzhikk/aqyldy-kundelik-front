@@ -1,0 +1,162 @@
+<div class="test-taking-container" *ngIf="!loading(); else loadingTemplate">
+  <div class="test-header">
+    <!-- Test Title -->
+    <h1>{{ attempt()?.testTitle }}</h1>
+
+    <!-- Timer -->
+    <div class="timer" [class.warning]="getTimerColor() === 'warn'">
+      <mat-icon>timer</mat-icon>
+      <span class="time">{{ formatTime(remainingSeconds()) }}</span>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <mat-progress-bar
+    mode="determinate"
+    [value]="(getAnsweredCount() / getTotalQuestions()) * 100"
+    [color]="getTimerColor()"
+  ></mat-progress-bar>
+
+  <!-- Question Navigation -->
+  <mat-card class="question-nav">
+    <div class="nav-title">Questions ({{ getAnsweredCount() }} / {{ getTotalQuestions() }})</div>
+    <div class="nav-buttons">
+      @for (question of attempt()?.questions; track question.id; let i = $index) {
+        <button
+          mat-mini-fab
+          [color]="currentQuestionIndex() === i ? 'primary' : 'basic'"
+          [class.answered]="isQuestionAnswered(i)"
+          (click)="goToQuestion(i)"
+        >
+          {{ i + 1 }}
+        </button>
+      }
+    </div>
+  </mat-card>
+
+  <!-- Current Question -->
+  @if (getCurrentQuestion(); as question) {
+    <mat-card class="question-card">
+      <mat-card-header>
+        <mat-card-title>
+          Question {{ currentQuestionIndex() + 1 }} of {{ getTotalQuestions() }}
+        </mat-card-title>
+        <mat-chip highlighted [color]="isQuestionAnswered(currentQuestionIndex()) ? 'primary' : 'accent'">
+          {{ isQuestionAnswered(currentQuestionIndex()) ? 'Answered' : 'Not Answered' }}
+        </mat-chip>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Question Text -->
+        <div class="question-text">
+          {{ question.text }}
+        </div>
+
+        <!-- Choices -->
+        <div class="choices">
+          @for (choice of question.choices; track choice.id) {
+            <div
+              class="choice-option"
+              [class.selected]="getAnswer(question.id) === choice.id"
+              (click)="setAnswer(question.id, choice.id)"
+            >
+              <input
+                type="radio"
+                [name]="'question-' + question.id"
+                [value]="choice.id"
+                [checked]="getAnswer(question.id) === choice.id"
+                (change)="setAnswer(question.id, choice.id)"
+              />
+              <label>{{ choice.text }}</label>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+
+      <!-- Navigation Buttons -->
+      <mat-card-actions>
+        <div class="nav-actions">
+          <button
+            mat-raised-button
+            (click)="previousQuestion()"
+            [disabled]="isFirstQuestion()"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Previous
+          </button>
+
+          <button
+            mat-raised-button
+            *ngIf="!isLastQuestion()"
+            color="primary"
+            (click)="nextQuestion()"
+          >
+            Next
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+
+          <button
+            mat-raised-button
+            *ngIf="isLastQuestion()"
+            color="accent"
+            (click)="submitAttempt()"
+            [disabled]="submitting()"
+          >
+            <mat-icon>send</mat-icon>
+            {{ submitting() ? 'Submitting...' : 'Submit Test' }}
+          </button>
+        </div>
+
+        <!-- Submit Button (always visible) -->
+        <div class="submit-action">
+          <button
+            mat-raised-button
+            color="warn"
+            (click)="submitAttempt()"
+            [disabled]="submitting()"
+          >
+            <mat-icon>check_circle</mat-icon>
+            {{ submitting() ? 'Submitting...' : 'Submit Test Early' }}
+          </button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  <!-- Summary Card -->
+  <mat-card class="summary-card">
+    <mat-card-header>
+      <mat-card-title>Test Summary</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="label">Total Questions:</span>
+          <span class="value">{{ getTotalQuestions() }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Answered:</span>
+          <span class="value">{{ getAnsweredCount() }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Remaining:</span>
+          <span class="value">{{ getTotalQuestions() - getAnsweredCount() }}</span>
+        </div>
+        <div class="stat">
+          <span class="label">Time Left:</span>
+          <span class="value" [style.color]="getTimerColor() === 'warn' ? '#f44336' : '#666'">
+            {{ formatTime(remainingSeconds()) }}
+          </span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading test...</p>
+  </div>
+</ng-template>

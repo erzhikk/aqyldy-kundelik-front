@@ -1,0 +1,40 @@
+mat-nav-list {
+  padding: 0;
+
+  h3 {
+    padding: 16px 16px 8px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  a[mat-list-item] {
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    mat-icon {
+      color: #1976d2;
+    }
+
+    &:last-child mat-icon {
+      color: #666;
+    }
+  }
+
+  mat-divider {
+    margin: 8px 0;
+  }
+}

@@ -1,0 +1,187 @@
+<div class="tests-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Tests</h1>
+    <button
+      *ngIf="canManage()"
+      mat-raised-button
+      color="primary"
+      (click)="create()"
+    >
+      <mat-icon>add</mat-icon>
+      Create Test
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <mat-form-field appearance="outline">
+      <mat-label>Search</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Search by title or description...">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Subject</mat-label>
+      <mat-select [formControl]="subjectFilter">
+        <mat-option [value]="null">All Subjects</mat-option>
+        @for (subject of subjects(); track subject.id) {
+          <mat-option [value]="subject.id">{{ subject.nameRu }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Grade</mat-label>
+      <mat-select [formControl]="gradeFilter">
+        <mat-option [value]="null">All Grades</mat-option>
+        @for (grade of grades; track grade) {
+          <mat-option [value]="grade">Grade {{ grade }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="publishedFilter">
+        @for (option of publishedOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button (click)="clearFilters()">
+      <mat-icon>clear</mat-icon>
+      Clear Filters
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <table mat-table [dataSource]="tests()">
+      <!-- Title Column -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let test">
+          <div class="test-title">
+            {{ test.title }}
+            @if (test.description) {
+              <span class="test-description">{{ test.description }}</span>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Subject Column -->
+      <ng-container matColumnDef="subject">
+        <th mat-header-cell *matHeaderCellDef>Subject</th>
+        <td mat-cell *matCellDef="let test">
+          {{ getSubjectName(test.subjectId) }}
+        </td>
+      </ng-container>
+
+      <!-- Grade Column -->
+      <ng-container matColumnDef="grade">
+        <th mat-header-cell *matHeaderCellDef>Grade</th>
+        <td mat-cell *matCellDef="let test">
+          Grade {{ test.grade }}
+        </td>
+      </ng-container>
+
+      <!-- Published Column -->
+      <ng-container matColumnDef="published">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let test">
+          <mat-chip-set>
+            <mat-chip
+              [highlighted]="test.published"
+              [color]="test.published ? 'primary' : 'accent'"
+            >
+              {{ test.published ? 'Published' : 'Draft' }}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <!-- Has Attempts Column -->
+      <ng-container matColumnDef="hasAttempts">
+        <th mat-header-cell *matHeaderCellDef>Attempts</th>
+        <td mat-cell *matCellDef="let test">
+          @if (test.hasAttempts) {
+            <mat-icon color="primary" matTooltip="Has student attempts">check_circle</mat-icon>
+          } @else {
+            <mat-icon color="warn" matTooltip="No attempts yet">cancel</mat-icon>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let test">
+          <div class="actions-cell">
+            @if (canManage()) {
+              <!-- Edit button -->
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="edit(test)"
+                matTooltip="Edit test"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+
+              <!-- Publish button (only for drafts) -->
+              @if (!test.published) {
+                <button
+                  mat-icon-button
+                  color="accent"
+                  (click)="publish(test)"
+                  matTooltip="Publish test"
+                >
+                  <mat-icon>publish</mat-icon>
+                </button>
+              }
+
+              <!-- Delete button (disabled if has attempts) -->
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="delete(test)"
+                [disabled]="test.hasAttempts"
+                [matTooltip]="test.hasAttempts ? 'Cannot delete - has student attempts' : 'Delete test'"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayed"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayed"></tr>
+    </table>
+
+    <!-- No data message -->
+    @if (tests().length === 0) {
+      <div class="no-data">
+        <mat-icon>assignment</mat-icon>
+        <p>No tests found</p>
+        @if (canManage()) {
+          <button mat-raised-button color="primary" (click)="create()">
+            Create First Test
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="totalElements()"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  ></mat-paginator>
+</div>

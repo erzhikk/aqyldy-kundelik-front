@@ -1,0 +1,378 @@
+<div class="test-form-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button (click)="goBack()" matTooltip="Back to list">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ getPageTitle() }}</h1>
+
+    <!-- Status chip (edit mode only) -->
+    @if (isEditMode && currentTest) {
+      <mat-chip-set>
+        <mat-chip
+          [highlighted]="isPublished()"
+          [color]="isPublished() ? 'primary' : 'accent'"
+        >
+          {{ isPublished() ? 'Published' : 'Draft' }}
+        </mat-chip>
+      </mat-chip-set>
+    }
+  </div>
+
+  <!-- Warning for published tests -->
+  @if (isPublished()) {
+    <mat-card class="warning-card">
+      <mat-icon>info</mat-icon>
+      <div>
+        <strong>This test is published</strong>
+        <p>You cannot edit a published test. To make changes, you need to create a new test.</p>
+      </div>
+    </mat-card>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <!-- Basic Information -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">info</mat-icon>
+        <mat-card-title>Basic Information</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+          <!-- Test Name -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Test Name</mat-label>
+            <input matInput formControlName="name" placeholder="Enter test name" required>
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <mat-error>
+                @if (form.get('name')?.hasError('required')) {
+                  Test name is required
+                }
+                @if (form.get('name')?.hasError('minlength')) {
+                  Test name must be at least 3 characters
+                }
+                @if (form.get('name')?.hasError('maxlength')) {
+                  Test name must be less than 200 characters
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description (Optional)</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              placeholder="Enter test description"
+              rows="3"
+            ></textarea>
+            @if (form.get('description')?.invalid && form.get('description')?.touched) {
+              <mat-error>
+                Description must be less than 1000 characters
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Class Level -->
+          <mat-form-field appearance="outline">
+            <mat-label>
+              <span class="step-number">1.</span> Class Level
+            </mat-label>
+            <mat-select formControlName="classLevelId" required>
+              @if (classLevels && classLevels.length > 0) {
+                @for (classLevel of classLevels; track classLevel.id) {
+                  <mat-option [value]="classLevel.id">
+                    {{ classLevel.nameRu }}
+                  </mat-option>
+                }
+              } @else {
+                <mat-option disabled>Loading class levels...</mat-option>
+              }
+            </mat-select>
+            <mat-hint>
+              <strong>Step 1:</strong> Select class level first
+            </mat-hint>
+            @if (form.get('classLevelId')?.invalid && form.get('classLevelId')?.touched) {
+              <mat-error>Class level is required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Subject -->
+          <mat-form-field appearance="outline">
+            <mat-label>
+              <span class="step-number">2.</span> Subject
+            </mat-label>
+            <mat-select formControlName="subjectId" required [disabled]="!form.get('classLevelId')?.value">
+              @if (subjects && subjects.length > 0) {
+                @for (subject of subjects; track subject.id) {
+                  <mat-option [value]="subject.id">
+                    {{ subject.nameEn }}
+                  </mat-option>
+                }
+              } @else if (form.get('classLevelId')?.value) {
+                <mat-option disabled>No subjects available for selected class level</mat-option>
+              } @else {
+                <mat-option disabled>Select class level first</mat-option>
+              }
+            </mat-select>
+            @if (form.get('classLevelId')?.value && subjects) {
+              <mat-hint>
+                <strong>Step 2:</strong> {{ subjects.length }} subject(s) available
+              </mat-hint>
+            } @else {
+              <mat-hint class="warning-hint">
+                ⚠ Please select class level first (Step 1)
+              </mat-hint>
+            }
+            @if (form.get('subjectId')?.invalid && form.get('subjectId')?.touched) {
+              <mat-error>Subject is required</mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Test Settings -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">settings</mat-icon>
+        <mat-card-title>Test Settings</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+          <!-- Duration -->
+          <mat-form-field appearance="outline">
+            <mat-label>Duration (minutes)</mat-label>
+            <input
+              matInput
+              type="number"
+              [value]="getDurationInMinutes()"
+              (input)="updateDurationFromMinutes($any($event.target).value)"
+              min="1"
+              max="240"
+              required
+            >
+            <mat-hint>
+              {{ formatDuration(form.get('durationSec')?.value || 3600) }}
+            </mat-hint>
+            @if (form.get('durationSec')?.invalid && form.get('durationSec')?.touched) {
+              <mat-error>Duration must be between 1 and 240 minutes</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Allowed Attempts -->
+          <mat-form-field appearance="outline">
+            <mat-label>Allowed Attempts</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="allowedAttempts"
+              min="1"
+              max="10"
+              required
+            >
+            <mat-hint>How many times students can take this test</mat-hint>
+            @if (form.get('allowedAttempts')?.invalid && form.get('allowedAttempts')?.touched) {
+              <mat-error>Must be between 1 and 10</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Passing Percent -->
+          <mat-form-field appearance="outline">
+            <mat-label>Passing Percentage</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="passingPercent"
+              min="0"
+              max="100"
+              required
+            >
+            <span matTextSuffix>%</span>
+            <mat-hint>Minimum score to pass the test</mat-hint>
+            @if (form.get('passingPercent')?.invalid && form.get('passingPercent')?.touched) {
+              <mat-error>Must be between 0 and 100</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Review Policy -->
+          <mat-form-field appearance="outline">
+            <mat-label>Review Policy</mat-label>
+            <mat-select formControlName="reviewPolicy" required>
+              @for (policy of reviewPolicyOptions; track policy.value) {
+                <mat-option [value]="policy.value">
+                  {{ policy.label }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-hint>
+              @if (form.get('reviewPolicy')?.value === 'AFTER_SUBMIT') {
+                Students can review immediately after submitting
+              } @else if (form.get('reviewPolicy')?.value === 'AFTER_CLOSE') {
+                Students can review only after test closes
+              } @else {
+                Students cannot review their answers
+              }
+            </mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Scheduling -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">schedule</mat-icon>
+        <mat-card-title>Scheduling (Optional)</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="form-grid">
+          <!-- Opens At -->
+          <mat-form-field appearance="outline">
+            <mat-label>Opens At</mat-label>
+            <input
+              matInput
+              [matDatepicker]="opensAtPicker"
+              formControlName="opensAt"
+              placeholder="Select date and time"
+            >
+            <mat-datepicker-toggle matIconSuffix [for]="opensAtPicker"></mat-datepicker-toggle>
+            <mat-datepicker #opensAtPicker></mat-datepicker>
+            <mat-hint>When students can start taking the test</mat-hint>
+          </mat-form-field>
+
+          <!-- Closes At -->
+          <mat-form-field appearance="outline">
+            <mat-label>Closes At</mat-label>
+            <input
+              matInput
+              [matDatepicker]="closesAtPicker"
+              formControlName="closesAt"
+              placeholder="Select date and time"
+            >
+            <mat-datepicker-toggle matIconSuffix [for]="closesAtPicker"></mat-datepicker-toggle>
+            <mat-datepicker #closesAtPicker></mat-datepicker>
+            <mat-hint>When students can no longer take the test</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Options -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-icon class="section-icon">tune</mat-icon>
+        <mat-card-title>Test Options</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="options-container">
+          <!-- Shuffle Questions -->
+          <div class="option-item">
+            <mat-checkbox formControlName="shuffleQuestions">
+              Shuffle Questions
+            </mat-checkbox>
+            <span class="option-description">
+              Present questions in random order for each student
+            </span>
+          </div>
+
+          <!-- Shuffle Choices -->
+          <div class="option-item">
+            <mat-checkbox formControlName="shuffleChoices">
+              Shuffle Answer Choices
+            </mat-checkbox>
+            <span class="option-description">
+              Present answer choices in random order
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <div class="left-actions">
+        @if (isEditMode) {
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="navigateToComposition()"
+            [disabled]="loading"
+            matTooltip="Edit test composition (questions)"
+          >
+            <mat-icon>list</mat-icon>
+            Edit Questions
+          </button>
+        }
+
+        @if (isEditMode && !isPublished()) {
+          <button
+            mat-raised-button
+            color="accent"
+            type="button"
+            (click)="publish()"
+            [disabled]="loading || form.invalid"
+            matTooltip="Publish test (cannot be edited after publishing)"
+          >
+            <mat-icon>publish</mat-icon>
+            Publish
+          </button>
+        }
+      </div>
+
+      <div class="right-actions">
+        <button
+          mat-button
+          type="button"
+          (click)="goBack()"
+          [disabled]="loading"
+        >
+          Cancel
+        </button>
+
+        @if (isEditMode && !hasAttempts()) {
+          <button
+            mat-raised-button
+            color="warn"
+            type="button"
+            (click)="delete()"
+            [disabled]="loading"
+            matTooltip="Delete test"
+          >
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        }
+
+        @if (isEditMode && hasAttempts()) {
+          <button
+            mat-raised-button
+            color="warn"
+            type="button"
+            disabled
+            matTooltip="Cannot delete - test has student attempts"
+          >
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        }
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid || loading || isPublished()"
+        >
+          <mat-icon>save</mat-icon>
+          {{ getSubmitButtonText() }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

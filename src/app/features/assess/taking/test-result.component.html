@@ -1,0 +1,156 @@
+<div class="result-container" *ngIf="!loading(); else loadingTemplate">
+  @if (result(); as res) {
+    <!-- Result Header -->
+    <mat-card class="result-header">
+      <div class="result-icon" [class.passed]="isPassed()" [class.failed]="!isPassed()">
+        <mat-icon>{{ isPassed() ? 'check_circle' : 'cancel' }}</mat-icon>
+      </div>
+
+      <h1>{{ res.testTitle }}</h1>
+
+      <mat-chip-set>
+        <mat-chip [color]="getStatusColor()" highlighted>
+          {{ getStatusText() }}
+        </mat-chip>
+      </mat-chip-set>
+
+      <div class="result-stats">
+        <div class="stat-item">
+          <div class="stat-value">{{ res.score }}</div>
+          <div class="stat-label">Score</div>
+        </div>
+        <div class="stat-divider">/</div>
+        <div class="stat-item">
+          <div class="stat-value">{{ res.maxScore }}</div>
+          <div class="stat-label">Max Score</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-value">{{ res.percentage }}%</div>
+          <div class="stat-label">Percentage</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <mat-progress-bar
+        mode="determinate"
+        [value]="res.percentage"
+        [color]="getStatusColor()"
+        class="result-progress"
+      ></mat-progress-bar>
+
+      <div class="submitted-at">
+        Submitted: {{ res.submittedAt | date:'medium' }}
+      </div>
+    </mat-card>
+
+    <!-- Summary Card -->
+    <mat-card class="summary-card" *ngIf="res.answers">
+      <mat-card-header>
+        <mat-card-title>Answer Summary</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="summary-grid">
+          <div class="summary-item correct">
+            <mat-icon>check_circle</mat-icon>
+            <div class="summary-content">
+              <div class="summary-value">{{ getCorrectCount() }}</div>
+              <div class="summary-label">Correct</div>
+            </div>
+          </div>
+
+          <div class="summary-item incorrect">
+            <mat-icon>cancel</mat-icon>
+            <div class="summary-content">
+              <div class="summary-value">{{ getIncorrectCount() }}</div>
+              <div class="summary-label">Incorrect</div>
+            </div>
+          </div>
+
+          <div class="summary-item total">
+            <mat-icon>assignment</mat-icon>
+            <div class="summary-content">
+              <div class="summary-value">{{ res.answers.length }}</div>
+              <div class="summary-label">Total</div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Answer Review (if allowed) -->
+    @if (res.reviewAllowed && res.answers) {
+      <mat-card class="review-card">
+        <mat-card-header>
+          <mat-card-title>Answer Review</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="answers-list">
+            @for (answer of res.answers; track answer.questionId; let i = $index) {
+              <div class="answer-item" [class.correct]="answer.isCorrect" [class.incorrect]="!answer.isCorrect">
+                <div class="answer-header">
+                  <div class="question-number">Question {{ i + 1 }}</div>
+                  <mat-chip [color]="answer.isCorrect ? 'primary' : 'warn'" highlighted>
+                    {{ answer.isCorrect ? 'Correct' : 'Incorrect' }}
+                  </mat-chip>
+                </div>
+
+                <div class="question-text">{{ answer.questionText }}</div>
+
+                <div class="answer-details">
+                  <div class="user-answer">
+                    <strong>Your Answer:</strong>
+                    <span [class.wrong]="!answer.isCorrect">{{ answer.choiceText }}</span>
+                  </div>
+
+                  @if (!answer.isCorrect && answer.correctChoiceText) {
+                    <div class="correct-answer">
+                      <strong>Correct Answer:</strong>
+                      <span class="right">{{ answer.correctChoiceText }}</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="answer-weight">
+                  Points: {{ answer.isCorrect ? answer.weight : 0 }} / {{ answer.weight }}
+                </div>
+              </div>
+
+              @if (!$last) {
+                <mat-divider></mat-divider>
+              }
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    @if (!res.reviewAllowed) {
+      <mat-card class="info-card">
+        <mat-icon>info</mat-icon>
+        <div>
+          <strong>Answer review is not available</strong>
+          <p>The instructor has disabled answer review for this test.</p>
+        </div>
+      </mat-card>
+    }
+
+    <!-- Actions -->
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="goToDashboard()">
+        <mat-icon>home</mat-icon>
+        Back to Dashboard
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading result...</p>
+  </div>
+</ng-template>

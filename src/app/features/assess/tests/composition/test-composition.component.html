@@ -1,0 +1,181 @@
+<div class="composition-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button mat-icon-button (click)="goBack()" matTooltip="Back to test">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Test Composition: {{ test()?.title }}</h1>
+
+    @if (isPublished()) {
+      <mat-chip highlighted color="primary">Published</mat-chip>
+    }
+  </div>
+
+  <!-- Warning for published tests -->
+  @if (isPublished()) {
+    <mat-card class="warning-card">
+      <mat-icon>lock</mat-icon>
+      <div>
+        <strong>Test is published</strong>
+        <p>You cannot modify the composition of a published test.</p>
+      </div>
+    </mat-card>
+  }
+
+  <!-- Two-panel layout -->
+  <div class="panels-container">
+    <!-- Left Panel: Question Bank -->
+    <mat-card class="panel question-bank">
+      <mat-card-header>
+        <mat-card-title>Question Bank</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Filters -->
+        <div class="filters">
+          <mat-form-field appearance="outline">
+            <mat-label>Search</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Search questions...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Topic</mat-label>
+            <mat-select [formControl]="topicFilter">
+              <mat-option [value]="null">All Topics</mat-option>
+              @for (topic of topics(); track topic.id) {
+                <mat-option [value]="topic.id">{{ topic.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Difficulty</mat-label>
+            <mat-select [formControl]="difficultyFilter">
+              <mat-option [value]="null">All Levels</mat-option>
+              @for (diff of difficulties; track diff) {
+                <mat-option [value]="diff">{{ diff }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Question List -->
+        <mat-list class="question-list">
+          @for (question of availableQuestions(); track question.id) {
+            <mat-list-item>
+              <div class="question-item">
+                <div class="question-content">
+                  <span class="question-text">{{ question.text }}</span>
+                  <mat-chip-set>
+                    <mat-chip [color]="getDifficultyColor(question.difficulty)" highlighted>
+                      {{ question.difficulty }}
+                    </mat-chip>
+                  </mat-chip-set>
+                </div>
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="addQuestionToTest(question)"
+                  [disabled]="isPublished()"
+                  matTooltip="Add to test"
+                >
+                  <mat-icon>add_circle</mat-icon>
+                </button>
+              </div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          } @empty {
+            <div class="no-data">
+              <mat-icon>search_off</mat-icon>
+              <p>No questions found</p>
+            </div>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Right Panel: Test Basket -->
+    <mat-card class="panel test-basket">
+      <mat-card-header>
+        <mat-card-title>Test Questions ({{ testQuestions().length }})</mat-card-title>
+        <div class="total-score">
+          Total Score: <strong>{{ getTotalScore() }}</strong>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Sortable List -->
+        <mat-list
+          cdkDropList
+          (cdkDropListDropped)="onDrop($event)"
+          class="test-question-list"
+        >
+          @for (tq of testQuestions(); track tq.questionId) {
+            <mat-list-item cdkDrag [cdkDragDisabled]="isPublished()">
+              <div class="test-question-item">
+                <!-- Drag Handle -->
+                <mat-icon cdkDragHandle class="drag-handle" *ngIf="!isPublished()">
+                  drag_indicator
+                </mat-icon>
+
+                <!-- Order Badge -->
+                <div class="order-badge">{{ tq.order + 1 }}</div>
+
+                <!-- Question Text -->
+                <div class="question-content">
+                  <span class="question-text">{{ tq.questionText || 'Question ' + (tq.order + 1) }}</span>
+                </div>
+
+                <!-- Weight Input -->
+                <mat-form-field appearance="outline" class="weight-field">
+                  <mat-label>Weight</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    min="0"
+                    max="10"
+                    [value]="getWeight(tq.questionId)"
+                    (input)="updateWeight(tq.questionId, $any($event.target).value)"
+                    [disabled]="isPublished()"
+                  >
+                </mat-form-field>
+
+                <!-- Remove Button -->
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="removeQuestionFromTest(tq)"
+                  [disabled]="isPublished()"
+                  matTooltip="Remove from test"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          } @empty {
+            <div class="no-data">
+              <mat-icon>assignment</mat-icon>
+              <p>No questions added yet</p>
+              <small>Add questions from the question bank on the left</small>
+            </div>
+          }
+        </mat-list>
+      </mat-card-content>
+
+      <!-- Save Button -->
+      <mat-card-actions>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveComposition()"
+          [disabled]="loading() || isPublished() || testQuestions().length === 0"
+        >
+          <mat-icon>save</mat-icon>
+          {{ loading() ? 'Saving...' : 'Save Composition' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

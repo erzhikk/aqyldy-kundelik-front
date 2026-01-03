@@ -59,11 +59,11 @@ export class SubjectsService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Get list of all class levels
-   * @returns Observable of ClassLevelDto array
+   * Get all class levels for select/dropdown (without pagination)
+   * @returns Observable of ClassLevelDto array sorted by level
    */
   getClassLevels(): Observable<ClassLevelDto[]> {
-    return this.http.get<ClassLevelDto[]>('/api/class-levels');
+    return this.http.get<ClassLevelDto[]>('/api/class-levels/all');
   }
 
   /**
@@ -72,6 +72,15 @@ export class SubjectsService {
    */
   list(): Observable<SubjectDto[]> {
     return this.http.get<SubjectDto[]>(this.base);
+  }
+
+  /**
+   * Get subjects by class level ID (for dropdowns/selects)
+   * @param classLevelId Class level UUID
+   * @returns Observable of SubjectDto array filtered by class level
+   */
+  getByClassLevel(classLevelId: string): Observable<SubjectDto[]> {
+    return this.http.get<SubjectDto[]>(`${this.base}/by-class-level/${classLevelId}`);
   }
 
   /**
