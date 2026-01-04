@@ -16,112 +16,110 @@ import { TokenStorage } from '../../../core/auth/token-storage.service';
   selector: 'app-quick-actions',
   imports: [CommonModule],
   template: `
-    <div class="p-4 border rounded-2xl flex flex-wrap gap-2">
+    <div class="quick-actions-card">
+      <div class="quick-actions-title">Quick Actions</div>
+      <div class="quick-actions-buttons">
       @if (can('ADMIN', 'SUPER_ADMIN')) {
         <button
-          class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          class="qa-btn qa-mint"
           (click)="go('/app/users')"
         >
-          + Create user
+          <span class="qa-plus">+</span>
+          Create user
         </button>
       }
 
       @if (can('ADMIN_SCHEDULE', 'SUPER_ADMIN')) {
         <button
-          class="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+          class="qa-btn qa-sea"
           (click)="go('/app/timetable')"
         >
-          + Add lesson
+          <span class="qa-plus">+</span>
+          Add lesson
         </button>
       }
 
       @if (can('TEACHER', 'ADMIN', 'SUPER_ADMIN')) {
         <button
-          class="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition-colors"
+          class="qa-btn qa-sage"
           (click)="go('/app/attendance')"
         >
-          + Attendance sheet
+          <span class="qa-plus">+</span>
+          Attendance sheet
         </button>
       }
+      </div>
     </div>
   `,
   styles: [`
-    .p-4 {
-      padding: 1rem;
+    .quick-actions-card {
+      border-radius: 16px;
+      border: 1px solid #d6e4f0;
+      background: #ffffff;
+      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+      padding: 16px 18px;
     }
 
-    .border {
-      border: 1px solid #e5e7eb;
+    .quick-actions-title {
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
     }
 
-    .rounded-2xl {
-      border-radius: 1rem;
-    }
-
-    .flex {
+    .quick-actions-buttons {
       display: flex;
-    }
-
-    .flex-wrap {
       flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .gap-2 {
-      gap: 0.5rem;
-    }
-
-    button {
+    .qa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, 0.3);
       font-family: inherit;
       font-size: 0.875rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
-      border: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
     }
 
-    .px-3 {
-      padding-left: 0.75rem;
-      padding-right: 0.75rem;
+    .qa-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(15, 118, 110, 0.2);
     }
 
-    .py-2 {
-      padding-top: 0.5rem;
-      padding-bottom: 0.5rem;
+    .qa-plus {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(15, 118, 110, 0.18);
+      color: #0f5f58;
+      font-weight: 700;
+      line-height: 1;
     }
 
-    .bg-blue-600 {
-      background-color: #2563eb;
+    .qa-mint {
+      background: #e6f5f1;
+      color: #0f5f58;
     }
 
-    .bg-indigo-600 {
-      background-color: #4f46e5;
+    .qa-sea {
+      background: rgba(14, 165, 164, 0.12);
+      color: #0f5f58;
+      border-color: rgba(14, 165, 164, 0.4);
     }
 
-    .bg-emerald-600 {
-      background-color: #059669;
-    }
-
-    .text-white {
-      color: white;
-    }
-
-    .rounded {
-      border-radius: 0.375rem;
-    }
-
-    .hover\\:bg-blue-700:hover {
-      background-color: #1d4ed8;
-    }
-
-    .hover\\:bg-indigo-700:hover {
-      background-color: #4338ca;
-    }
-
-    .hover\\:bg-emerald-700:hover {
-      background-color: #047857;
-    }
-
-    .transition-colors {
-      transition: background-color 0.2s;
+    .qa-sage {
+      background: rgba(34, 197, 94, 0.12);
+      color: #166534;
+      border-color: rgba(34, 197, 94, 0.35);
     }
   `]
 })

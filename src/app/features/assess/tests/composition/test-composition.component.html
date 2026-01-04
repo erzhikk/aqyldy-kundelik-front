@@ -1,14 +1,25 @@
 <div class="composition-container">
   <!-- Header -->
-  <div class="page-header">
-    <button mat-icon-button (click)="goBack()" matTooltip="Back to test">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>Test Composition: {{ test()?.title }}</h1>
+  <div class="page-header hero">
+    <div class="hero-left">
+      <button mat-icon-button class="back-button" (click)="goBack()" matTooltip="Back to test">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Test Composition</h1>
+        <p class="hero-subtitle">{{ test()?.title }}</p>
+      </div>
+    </div>
 
-    @if (isPublished()) {
-      <mat-chip highlighted color="primary">Published</mat-chip>
-    }
+    <div class="hero-right">
+      @if (isPublished()) {
+        <mat-chip highlighted color="primary">Published</mat-chip>
+      }
+      <div class="hero-meta">
+        <mat-icon>quiz</mat-icon>
+        <span>Questions: {{ testQuestions().length }}</span>
+      </div>
+    </div>
   </div>
 
   <!-- Warning for published tests -->
@@ -168,7 +179,7 @@
       <mat-card-actions>
         <button
           mat-raised-button
-          color="primary"
+          class="aqyldy-btn-mint"
           (click)="saveComposition()"
           [disabled]="loading() || isPublished() || testQuestions().length === 0"
         >

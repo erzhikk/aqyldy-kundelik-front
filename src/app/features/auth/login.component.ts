@@ -74,14 +74,18 @@ import { AuthService } from '../../core/auth/auth.service';
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background:
+        radial-gradient(circle at top right, rgba(14, 165, 164, 0.18), rgba(14, 165, 164, 0)),
+        linear-gradient(135deg, #f3f8ff 0%, #f4fff6 100%);
+      padding: 24px;
     }
 
     .login-card {
       background: white;
       padding: 2.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border-radius: 18px;
+      border: 1px solid #d6e4f0;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
       width: 100%;
       max-width: 420px;
     }
@@ -89,12 +93,12 @@ import { AuthService } from '../../core/auth/auth.service';
     h1 {
       font-size: 1.75rem;
       margin-bottom: 0.25rem;
-      color: #1f2937;
+      color: #0f172a;
       text-align: center;
     }
 
     .subtitle {
-      color: #6b7280;
+      color: #64748b;
       margin-bottom: 2rem;
       text-align: center;
       font-size: 0.875rem;
@@ -107,7 +111,7 @@ import { AuthService } from '../../core/auth/auth.service';
     label {
       display: block;
       font-weight: 500;
-      color: #374151;
+      color: #334155;
       margin-bottom: 0.5rem;
       font-size: 0.875rem;
     }
@@ -115,17 +119,19 @@ import { AuthService } from '../../core/auth/auth.service';
     input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid #d6e4f0;
       border-radius: 0.5rem;
       font-size: 1rem;
       transition: all 0.2s;
       box-sizing: border-box;
+      background: #f8fafc;
     }
 
     input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #0f766e;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+      background: #ffffff;
     }
 
     input.error {
@@ -139,8 +145,8 @@ import { AuthService } from '../../core/auth/auth.service';
     }
 
     .server-error {
-      background: #fee2e2;
-      color: #dc2626;
+      background: rgba(239, 68, 68, 0.12);
+      color: #b91c1c;
       padding: 0.75rem;
       border-radius: 0.5rem;
       margin-bottom: 1rem;
@@ -149,7 +155,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
     .btn-primary {
       width: 100%;
-      background: #667eea;
+      background: #0f766e;
       color: white;
       padding: 0.875rem;
       border: none;
@@ -161,9 +167,9 @@ import { AuthService } from '../../core/auth/auth.service';
     }
 
     .btn-primary:hover:not(:disabled) {
-      background: #5568d3;
+      background: #0d645e;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 10px 18px rgba(15, 118, 110, 0.25);
     }
 
     .btn-primary:disabled {
@@ -175,11 +181,11 @@ import { AuthService } from '../../core/auth/auth.service';
       margin-top: 1.5rem;
       text-align: center;
       font-size: 0.75rem;
-      color: #6b7280;
+      color: #64748b;
     }
 
     .hint strong {
-      color: #374151;
+      color: #0f172a;
     }
   `]
 })

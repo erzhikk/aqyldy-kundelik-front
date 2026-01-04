@@ -1,4 +1,11 @@
 .staff-card-container {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #d6e4f0;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --accent: #0f766e;
+
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
@@ -40,11 +47,17 @@
   h1 {
     margin: 0;
     font-size: 28px;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--ink);
   }
 }
 
 .info-card {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+
   mat-card-header {
     margin-bottom: 16px;
 
@@ -53,18 +66,18 @@
       height: 40px;
       font-size: 40px;
       background: none;
-      color: #1976d2;
+      color: var(--accent);
 
       &.teacher-icon {
         color: #4caf50;
       }
 
       &.class-teacher-icon {
-        color: #ff9800;
+        color: #f97316;
       }
 
       &.subjects-icon {
-        color: #9c27b0;
+        color: #0ea5a4;
       }
     }
 
@@ -73,17 +86,18 @@
       height: 60px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #e0e0e0;
+      border: 2px solid var(--line);
     }
 
     mat-card-title {
       font-size: 24px;
       margin-bottom: 4px;
+      color: var(--ink);
     }
 
     mat-card-subtitle {
       font-size: 14px;
-      color: #666;
+      color: var(--muted);
     }
   }
 
@@ -95,7 +109,7 @@
       justify-content: center;
       padding: 48px;
       text-align: center;
-      color: #999;
+      color: #94a3b8;
 
       mat-icon {
         font-size: 64px;
@@ -125,7 +139,7 @@
   gap: 12px;
 
   mat-icon {
-    color: #1976d2;
+    color: var(--accent);
     margin-top: 4px;
   }
 
@@ -137,14 +151,14 @@
 
     .info-label {
       font-size: 12px;
-      color: #666;
+      color: var(--muted);
       text-transform: uppercase;
       font-weight: 500;
     }
 
     .info-value {
       font-size: 16px;
-      color: #333;
+      color: var(--ink);
     }
   }
 }
@@ -160,8 +174,8 @@
     justify-content: center;
     gap: 16px;
     padding: 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
+    background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+    border-radius: 16px;
     color: white;
 
     mat-icon {
@@ -182,16 +196,17 @@
       align-items: center;
       gap: 12px;
       padding: 12px;
-      background: #f5f5f5;
-      border-radius: 8px;
+      background: var(--surface-2);
+      border-radius: 12px;
+      border: 1px solid var(--line);
 
       mat-icon {
-        color: #1976d2;
+        color: var(--accent);
       }
 
       .detail-label {
         font-size: 14px;
-        color: #666;
+        color: var(--muted);
         margin-right: 8px;
       }
     }
@@ -215,7 +230,7 @@
       gap: 12px;
 
       mat-icon {
-        color: #9c27b0;
+        color: #0ea5a4;
       }
 
       .subject-name {
@@ -226,19 +241,20 @@
 
     mat-panel-description {
       font-size: 14px;
-      color: #666;
+      color: var(--muted);
     }
   }
 
   .groups-container {
     padding: 16px;
-    background: #f5f5f5;
-    border-radius: 8px;
+    background: var(--surface-2);
+    border-radius: 12px;
+    border: 1px solid var(--line);
 
     h4 {
       margin: 0 0 12px 0;
       font-size: 14px;
-      color: #666;
+      color: var(--muted);
       text-transform: uppercase;
       font-weight: 500;
     }

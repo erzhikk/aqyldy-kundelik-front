@@ -4,10 +4,10 @@
     [mode]="sidenavMode()"
     [opened]="sidenavOpened()"
     (closed)="sidenavOpened.set(false)"
-    class="w-64"
+    class="w-64 app-sidenav"
   >
     <!-- App Title -->
-    <div class="p-4 font-semibold text-lg border-b">
+    <div class="p-4 font-semibold text-lg border-b sidenav-title">
       Aqyldy
     </div>
 
@@ -20,6 +20,7 @@
         routerLinkActive="active"
         [routerLinkActiveOptions]="{exact: m.path === ''}"
         [class.hidden]="!canShow(m)"
+        class="nav-link"
       >
         <mat-icon class="mr-3">{{ m.icon }}</mat-icon>
         <span>{{ m.label | translate }}</span>
@@ -30,11 +31,11 @@
   <!-- Main Content Area -->
   <mat-sidenav-content>
     <!-- Top Toolbar -->
-    <mat-toolbar color="primary" class="toolbar-sticky">
+    <mat-toolbar class="toolbar-sticky app-toolbar">
       <!-- Menu Toggle Button -->
       <button
         mat-icon-button
-        class="mr-2"
+        class="mr-2 menu-button"
         (click)="toggleSidenav()"
         aria-label="Toggle menu"
       >
@@ -42,22 +43,24 @@
       </button>
 
       <!-- App Title -->
-      <span class="font-semibold">Aqyldy Kundelik</span>
+      <span class="font-semibold app-title">Aqyldy Kundelik</span>
 
       <!-- Spacer -->
       <span class="flex-1"></span>
 
-      <!-- User Display Name -->
-      <span class="mr-4 text-sm opacity-90">{{ displayName() }}</span>
+      <div class="toolbar-actions">
+        <!-- User Display Name -->
+        <span class="text-sm user-name">{{ displayName() }}</span>
 
-      <!-- Language Switcher -->
-      <app-language-switcher></app-language-switcher>
+        <!-- Language Switcher -->
+        <app-language-switcher></app-language-switcher>
 
-      <!-- Logout Button -->
-      <button mat-button (click)="logout()">
-        <mat-icon class="mr-1">logout</mat-icon>
-        {{ 'AUTH.LOGOUT' | translate }}
-      </button>
+        <!-- Logout Button -->
+        <button mat-button class="logout-button" (click)="logout()">
+          <mat-icon class="mr-1">logout</mat-icon>
+          {{ 'AUTH.LOGOUT' | translate }}
+        </button>
+      </div>
     </mat-toolbar>
 
     <!-- Global Loading Indicator -->

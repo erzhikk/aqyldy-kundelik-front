@@ -1,16 +1,26 @@
+:host {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #d6e4f0;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --accent: #0f766e;
+}
+
 mat-dialog-content {
   padding: 1.5rem;
   max-width: 100%;
   max-height: 70vh;
   overflow-y: auto;
+  background: var(--surface);
 }
 
 .read-only-section {
-  background: #f8f9fa;
+  background: var(--surface-2);
   padding: 1.25rem;
-  border-radius: 0.5rem;
+  border-radius: 12px;
   margin-bottom: 1.5rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--line);
 }
 
 .avatar-section {
@@ -18,7 +28,7 @@ mat-dialog-content {
   justify-content: center;
   padding: 1rem 0;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--line);
 }
 
 .read-only-field {
@@ -35,19 +45,20 @@ mat-dialog-content {
 
 .read-only-field .label {
   font-weight: 600;
-  color: #555;
+  color: var(--muted);
   min-width: 7.5rem;
   font-size: 0.875rem;
 }
 
 .read-only-field .value {
-  color: #333;
+  color: var(--ink);
   word-break: break-all;
   font-size: 0.875rem;
   font-family: 'Courier New', monospace;
-  background: #fff;
+  background: var(--surface);
   padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
   flex: 1;
 }
 
@@ -59,13 +70,16 @@ mat-dialog-content {
 
 mat-form-field {
   width: 100%;
+  background: var(--surface-2);
+  border-radius: 12px;
 }
 
 mat-dialog-actions {
   padding: 1rem 1.5rem;
   margin: 0;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--line);
   gap: 0.75rem;
+  background: var(--surface-2);
 }
 
 button {

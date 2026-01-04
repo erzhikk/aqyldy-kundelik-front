@@ -129,8 +129,11 @@ export class TestsListComponent implements OnInit {
    */
   loadSubjects(): void {
     this.subjectsApi.list().subscribe({
-      next: (subjects) => {
-        this._subjects.set(subjects);
+      next: (subjects: any) => {
+        const list = Array.isArray(subjects)
+          ? subjects
+          : (subjects?.content ?? subjects?.data ?? []);
+        this._subjects.set(list);
       }
     });
   }

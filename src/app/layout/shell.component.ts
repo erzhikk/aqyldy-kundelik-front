@@ -52,6 +52,11 @@ type MenuItem = {
     :host {
       display: block;
       height: 100vh;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #d6e4f0;
+      --surface: #ffffff;
+      --accent: #0f766e;
     }
 
     .h-screen {
@@ -112,16 +117,57 @@ type MenuItem = {
 
     .toolbar-sticky {
       position: sticky !important;
-      top: 0 !important;
+      top: 12px !important;
       z-index: 10 !important;
+    }
+
+    .app-toolbar {
+      background: linear-gradient(135deg, #f3f8ff 0%, #f4fff6 100%) !important;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+      margin: 12px;
+      padding: 0 16px;
+      color: var(--ink);
+    }
+
+    .menu-button {
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+    }
+
+    .app-title {
+      font-size: 1.05rem;
+      letter-spacing: 0.2px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-name {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .logout-button {
+      border-radius: 999px;
+      border: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.7);
     }
 
     .loading-bar {
       position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
+      top: 12px !important;
+      left: 12px !important;
+      right: 12px !important;
       z-index: 20 !important;
+      border-radius: 999px;
+      overflow: hidden;
     }
 
     .content-container {
@@ -129,23 +175,81 @@ type MenuItem = {
     }
 
     /* Sidebar styling */
-    ::ng-deep mat-sidenav {
-      border-right: 1px solid #e5e7eb;
+    ::ng-deep mat-sidenav.app-sidenav {
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, #f8fbff 0%, #f4fff7 100%);
+      box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .sidenav-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+
+    ::ng-deep .app-sidenav .mat-mdc-nav-list {
+      padding-top: 12px;
+    }
+
+    ::ng-deep .app-sidenav .mat-mdc-list-item.nav-link {
+      margin: 4px 10px;
+      border-radius: 12px;
+      color: var(--ink);
+      transition: background-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+    }
+
+    ::ng-deep .app-sidenav .mat-mdc-list-item.nav-link .mat-mdc-list-item-icon,
+    ::ng-deep .app-sidenav .mat-mdc-list-item.nav-link mat-icon {
+      color: var(--muted);
     }
 
     /* Active link styling */
-    ::ng-deep .mat-mdc-list-item.active {
-      background-color: #eff6ff !important;
-      color: #2563eb !important;
+    ::ng-deep .app-sidenav .mat-mdc-list-item.active {
+      background: rgba(15, 118, 110, 0.12) !important;
+      color: #0f766e !important;
+      box-shadow: 0 10px 16px rgba(15, 118, 110, 0.18);
     }
 
-    ::ng-deep .mat-mdc-list-item.active mat-icon {
-      color: #2563eb !important;
+    ::ng-deep .app-sidenav .mat-mdc-list-item.active mat-icon {
+      color: #0f766e !important;
     }
 
     /* List item hover */
-    ::ng-deep .mat-mdc-list-item:hover:not(.active) {
-      background-color: #f9fafb !important;
+    ::ng-deep .app-sidenav .mat-mdc-list-item.nav-link:hover:not(.active) {
+      background-color: rgba(15, 118, 110, 0.08) !important;
+    }
+
+    @media (max-width: 720px) {
+      ::ng-deep mat-sidenav.app-sidenav {
+        border-radius: 14px;
+        margin: 8px 0 8px 8px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-toolbar {
+        margin: 8px;
+        padding: 0 12px;
+        border-radius: 14px;
+      }
+
+      .toolbar-sticky {
+        top: 8px !important;
+      }
+
+      .loading-bar {
+        top: 8px !important;
+        left: 8px !important;
+        right: 8px !important;
+      }
+
+      .app-title {
+        font-size: 0.98rem;
+      }
     }
   `]
 })

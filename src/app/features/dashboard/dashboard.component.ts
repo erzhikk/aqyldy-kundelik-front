@@ -19,9 +19,12 @@ import { TokenStorage } from '../../core/auth/token-storage.service';
   template: `
     <div class="dashboard-container">
       <!-- Header -->
-      <div class="dashboard-header">
-        <h1 class="dashboard-title">Dashboard</h1>
-        <p class="dashboard-subtitle">Welcome back, {{ userName() }}</p>
+      <div class="dashboard-header hero">
+        <div>
+          <h1 class="dashboard-title">Dashboard</h1>
+          <p class="dashboard-subtitle">Welcome back, {{ userName() }}</p>
+        </div>
+        <div class="hero-meta">Overview</div>
       </div>
 
       <!-- Widgets Grid -->
@@ -68,26 +71,63 @@ import { TokenStorage } from '../../core/auth/token-storage.service';
   `,
   styles: [`
     .dashboard-container {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #d6e4f0;
+      --surface: #ffffff;
+      --accent: #0f766e;
+
       padding: 1.5rem;
       max-width: 1400px;
       margin: 0 auto;
     }
 
-    .dashboard-header {
+    .dashboard-header.hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
       margin-bottom: 2rem;
+      padding: 20px 22px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, #f3f8ff 0%, #f4fff6 100%);
+      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-header.hero::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(14, 165, 164, 0.25), rgba(14, 165, 164, 0));
+      pointer-events: none;
     }
 
     .dashboard-title {
       font-size: 2rem;
       font-weight: 700;
-      color: #1f2937;
+      color: var(--ink);
       margin: 0 0 0.5rem 0;
     }
 
     .dashboard-subtitle {
       font-size: 1rem;
-      color: #6b7280;
+      color: var(--muted);
       margin: 0;
+    }
+
+    .hero-meta {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.7);
     }
 
     .grid {
@@ -165,6 +205,12 @@ import { TokenStorage } from '../../core/auth/token-storage.service';
     @media (max-width: 767px) {
       .dashboard-container {
         padding: 1rem;
+      }
+
+      .dashboard-header.hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
       }
 
       .dashboard-title {

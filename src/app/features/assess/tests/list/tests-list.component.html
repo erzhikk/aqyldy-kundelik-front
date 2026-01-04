@@ -1,16 +1,30 @@
 <div class="tests-list-container">
   <!-- Header -->
-  <div class="page-header">
-    <h1>Tests</h1>
-    <button
-      *ngIf="canManage()"
-      mat-raised-button
-      color="primary"
-      (click)="create()"
-    >
-      <mat-icon>add</mat-icon>
-      Create Test
-    </button>
+  <div class="page-header hero">
+    <div class="hero-left">
+      <div>
+        <h1>Tests</h1>
+        <p class="hero-subtitle">Manage assessments and publish when ready</p>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-meta">
+        <mat-icon>fact_check</mat-icon>
+        <span>All tests in one place</span>
+      </div>
+      <div class="hero-actions">
+        <button
+          *ngIf="canManage()"
+          mat-raised-button
+          class="aqyldy-btn-mint"
+          (click)="create()"
+        >
+          <mat-icon>add</mat-icon>
+          Create Test
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -168,7 +182,7 @@
         <mat-icon>assignment</mat-icon>
         <p>No tests found</p>
         @if (canManage()) {
-          <button mat-raised-button color="primary" (click)="create()">
+          <button mat-raised-button class="aqyldy-btn-mint" (click)="create()">
             Create First Test
           </button>
         }

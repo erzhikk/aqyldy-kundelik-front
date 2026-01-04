@@ -1,9 +1,13 @@
 .topic-performance-card {
   margin-bottom: 24px;
+  border-radius: 16px;
+  border: 1px solid #d6e4f0;
+  background: #ffffff;
+  box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
 
   mat-card-header {
     padding-bottom: 16px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #d6e4f0;
 
     mat-card-title {
       display: flex;
@@ -14,7 +18,7 @@
       margin: 0;
 
       mat-icon {
-        color: #1976d2;
+        color: #0f766e;
         font-size: 24px;
         width: 24px;
         height: 24px;
@@ -53,7 +57,7 @@
 
   p {
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 14px;
   }
 }
@@ -133,19 +137,19 @@
     font-size: 64px;
     width: 64px;
     height: 64px;
-    color: #ccc;
+    color: #94a3b8;
   }
 
   p {
     margin: 0;
     font-size: 18px;
     font-weight: 500;
-    color: #666;
+    color: #0f172a;
   }
 
   .empty-hint {
     font-size: 14px;
-    color: #999;
+    color: #64748b;
   }
 }
 

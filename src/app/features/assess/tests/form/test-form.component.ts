@@ -16,6 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSliderModule } from '@angular/material/slider';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotifyService } from '../../../../core/ui/notify.service';
 
 /**
@@ -50,7 +51,8 @@ import { NotifyService } from '../../../../core/ui/notify.service';
     MatCheckboxModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSliderModule
+    MatSliderModule,
+    TranslateModule
   ]
 })
 export class TestFormComponent implements OnInit {
@@ -60,6 +62,7 @@ export class TestFormComponent implements OnInit {
   private testsApi = inject(TestsService);
   private subjectsApi = inject(SubjectsService);
   private notify = inject(NotifyService);
+  private translate = inject(TranslateService);
 
   form!: FormGroup;
   loading = false;
@@ -140,7 +143,7 @@ export class TestFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading class levels:', err);
-        this.notify.error('Failed to load class levels');
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_CLASS_LEVELS_FAIL'));
         this.classLevels = [];
       }
     });
@@ -179,7 +182,7 @@ export class TestFormComponent implements OnInit {
         }
       },
       error: () => {
-        this.notify.error('Failed to load subjects');
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SUBJECTS_FAIL'));
         this.subjects = [];
         this.form.patchValue({ subjectId: '' });
       }
@@ -224,7 +227,7 @@ export class TestFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading test:', err);
-        this.notify.error('Failed to load test');
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_TEST_LOAD_FAIL'));
         this.loading = false;
         this.goBack();
       }
@@ -252,7 +255,7 @@ export class TestFormComponent implements OnInit {
     if (this.form.invalid || this.loading) return;
 
     if (this.isPublished()) {
-      this.notify.warning('Cannot edit published test');
+      this.notify.warning(this.translate.instant('TEST_FORM.NOTIFY_PUBLISHED_BLOCK'));
       return;
     }
 
@@ -279,7 +282,7 @@ export class TestFormComponent implements OnInit {
       this.testsApi.update(this.testId, body).subscribe({
         next: () => {
           this.loading = false;
-          this.notify.success('Test updated successfully');
+          this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_UPDATE_SUCCESS'));
           this.goBack();
         },
         error: () => {
@@ -307,7 +310,7 @@ export class TestFormComponent implements OnInit {
       this.testsApi.create(body).subscribe({
         next: () => {
           this.loading = false;
-          this.notify.success('Test created successfully');
+          this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_CREATE_SUCCESS'));
           this.goBack();
         },
         error: () => {
@@ -324,7 +327,7 @@ export class TestFormComponent implements OnInit {
   publish(): void {
     if (!this.testId || this.loading || this.isPublished()) return;
 
-    if (!confirm('Publish this test? After publishing, you cannot edit the test composition.')) {
+    if (!confirm(this.translate.instant('TEST_FORM.CONFIRM_PUBLISH'))) {
       return;
     }
 
@@ -332,7 +335,7 @@ export class TestFormComponent implements OnInit {
     this.testsApi.publish(this.testId).subscribe({
       next: () => {
         this.loading = false;
-        this.notify.success('Test published successfully');
+        this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_PUBLISH_SUCCESS'));
         this.goBack();
       },
       error: () => {
@@ -349,11 +352,11 @@ export class TestFormComponent implements OnInit {
     if (!this.testId || this.loading) return;
 
     if (this.hasAttempts()) {
-      this.notify.error('Cannot delete test with student attempts');
+      this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_DELETE_BLOCK'));
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+    if (!confirm(this.translate.instant('TEST_FORM.CONFIRM_DELETE'))) {
       return;
     }
 
@@ -361,7 +364,7 @@ export class TestFormComponent implements OnInit {
     this.testsApi.delete(this.testId).subscribe({
       next: () => {
         this.loading = false;
-        this.notify.success('Test deleted successfully');
+        this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_DELETE_SUCCESS'));
         this.goBack();
       },
       error: () => {
@@ -390,7 +393,7 @@ export class TestFormComponent implements OnInit {
    * Get page title
    */
   getPageTitle(): string {
-    return this.isEditMode ? 'Edit Test' : 'Create Test';
+    return this.translate.instant(this.isEditMode ? 'TEST_FORM.TITLE_EDIT' : 'TEST_FORM.TITLE_CREATE');
   }
 
   /**
@@ -398,9 +401,9 @@ export class TestFormComponent implements OnInit {
    */
   getSubmitButtonText(): string {
     if (this.loading) {
-      return this.isEditMode ? 'Updating...' : 'Creating...';
+      return this.translate.instant(this.isEditMode ? 'TEST_FORM.ACTION_UPDATING' : 'TEST_FORM.ACTION_CREATING');
     }
-    return this.isEditMode ? 'Update Test' : 'Create Test';
+    return this.translate.instant(this.isEditMode ? 'TEST_FORM.ACTION_UPDATE' : 'TEST_FORM.ACTION_CREATE');
   }
 
   /**

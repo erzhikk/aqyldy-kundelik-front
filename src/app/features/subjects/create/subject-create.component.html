@@ -43,7 +43,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
-  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || loading">
+  <button mat-raised-button class="aqyldy-btn-mint" (click)="submit()" [disabled]="form.invalid || loading">
     {{ loading ? 'Creating...' : 'Create Subject' }}
   </button>
 </mat-dialog-actions>

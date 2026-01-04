@@ -1,8 +1,18 @@
+:host {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #d6e4f0;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --accent: #0f766e;
+}
+
 mat-dialog-content {
   padding: 1.5rem;
   max-width: 100%;
   max-height: 70vh;
   overflow-y: auto;
+  background: var(--surface);
 }
 
 .avatar-section {
@@ -10,7 +20,7 @@ mat-dialog-content {
   justify-content: center;
   padding: 1rem 0;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--line);
 }
 
 .form-grid {
@@ -22,6 +32,8 @@ mat-dialog-content {
 
 mat-form-field {
   width: 100%;
+  background: var(--surface-2);
+  border-radius: 12px;
 }
 
 mat-form-field:nth-child(1),
@@ -33,8 +45,9 @@ mat-form-field:nth-child(3) {
 mat-dialog-actions {
   padding: 1rem 1.5rem;
   margin: 0;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--line);
   gap: 0.75rem;
+  background: var(--surface-2);
 }
 
 button {

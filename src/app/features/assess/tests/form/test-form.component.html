@@ -1,84 +1,107 @@
 <div class="test-form-container">
-  <!-- Header -->
-  <div class="page-header">
-    <button mat-icon-button (click)="goBack()" matTooltip="Back to list">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>{{ getPageTitle() }}</h1>
+  <div class="page-header hero">
+    <div class="hero-left">
+      <button
+        mat-icon-button
+        class="back-button"
+        (click)="goBack()"
+        [matTooltip]="'TEST_FORM.TOOLTIP_BACK' | translate"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="hero-titles">
+        <h1>{{ getPageTitle() }}</h1>
+        <p class="hero-subtitle">{{ 'TEST_FORM.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
 
-    <!-- Status chip (edit mode only) -->
-    @if (isEditMode && currentTest) {
-      <mat-chip-set>
-        <mat-chip
-          [highlighted]="isPublished()"
-          [color]="isPublished() ? 'primary' : 'accent'"
-        >
-          {{ isPublished() ? 'Published' : 'Draft' }}
-        </mat-chip>
-      </mat-chip-set>
-    }
+    <div class="hero-right">
+      @if (isEditMode && currentTest) {
+        <mat-chip-set>
+          <mat-chip
+            [highlighted]="isPublished()"
+            [color]="isPublished() ? 'primary' : 'accent'"
+          >
+            {{ isPublished() ? ('TEST_FORM.STATUS_PUBLISHED' | translate) : ('TEST_FORM.STATUS_DRAFT' | translate) }}
+          </mat-chip>
+        </mat-chip-set>
+      }
+
+      <div class="hero-meta">
+        <mat-icon>assignment</mat-icon>
+        <span>{{ 'TEST_FORM.META' | translate }}</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Warning for published tests -->
   @if (isPublished()) {
     <mat-card class="warning-card">
       <mat-icon>info</mat-icon>
       <div>
-        <strong>This test is published</strong>
-        <p>You cannot edit a published test. To make changes, you need to create a new test.</p>
+        <strong>{{ 'TEST_FORM.PUBLISHED_TITLE' | translate }}</strong>
+        <p>{{ 'TEST_FORM.PUBLISHED_MESSAGE' | translate }}</p>
       </div>
     </mat-card>
   }
 
   <form [formGroup]="form" (ngSubmit)="submit()">
-    <!-- Basic Information -->
     <mat-card class="section-card">
-      <mat-card-header>
-        <mat-icon class="section-icon">info</mat-icon>
-        <mat-card-title>Basic Information</mat-card-title>
+      <mat-card-header class="section-header">
+        <div class="section-header-inner">
+          <div class="section-icon-wrap">
+            <mat-icon class="section-icon">info</mat-icon>
+          </div>
+          <div>
+            <mat-card-title>{{ 'TEST_FORM.SECTION_BASIC_TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'TEST_FORM.SECTION_BASIC_SUBTITLE' | translate }}</mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-grid">
-          <!-- Test Name -->
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Test Name</mat-label>
-            <input matInput formControlName="name" placeholder="Enter test name" required>
+            <mat-label>{{ 'TEST_FORM.FIELD_NAME_LABEL' | translate }}</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              [placeholder]="'TEST_FORM.FIELD_NAME_PLACEHOLDER' | translate"
+              required
+            >
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
               <mat-error>
                 @if (form.get('name')?.hasError('required')) {
-                  Test name is required
+                  {{ 'TEST_FORM.FIELD_NAME_ERROR_REQUIRED' | translate }}
                 }
                 @if (form.get('name')?.hasError('minlength')) {
-                  Test name must be at least 3 characters
+                  {{ 'TEST_FORM.FIELD_NAME_ERROR_MIN' | translate }}
                 }
                 @if (form.get('name')?.hasError('maxlength')) {
-                  Test name must be less than 200 characters
+                  {{ 'TEST_FORM.FIELD_NAME_ERROR_MAX' | translate }}
                 }
               </mat-error>
             }
           </mat-form-field>
 
-          <!-- Description -->
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description (Optional)</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_DESC_LABEL' | translate }}</mat-label>
             <textarea
               matInput
               formControlName="description"
-              placeholder="Enter test description"
+              [placeholder]="'TEST_FORM.FIELD_DESC_PLACEHOLDER' | translate"
               rows="3"
             ></textarea>
             @if (form.get('description')?.invalid && form.get('description')?.touched) {
               <mat-error>
-                Description must be less than 1000 characters
+                {{ 'TEST_FORM.FIELD_DESC_ERROR_MAX' | translate }}
               </mat-error>
             }
           </mat-form-field>
 
-          <!-- Class Level -->
           <mat-form-field appearance="outline">
             <mat-label>
-              <span class="step-number">1.</span> Class Level
+              <span class="step-number">1.</span>
+              {{ 'TEST_FORM.FIELD_CLASS_LEVEL_LABEL' | translate }}
             </mat-label>
             <mat-select formControlName="classLevelId" required>
               @if (classLevels && classLevels.length > 0) {
@@ -88,21 +111,19 @@
                   </mat-option>
                 }
               } @else {
-                <mat-option disabled>Loading class levels...</mat-option>
+                <mat-option disabled>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_LOADING' | translate }}</mat-option>
               }
             </mat-select>
-            <mat-hint>
-              <strong>Step 1:</strong> Select class level first
-            </mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_HINT' | translate }}</mat-hint>
             @if (form.get('classLevelId')?.invalid && form.get('classLevelId')?.touched) {
-              <mat-error>Class level is required</mat-error>
+              <mat-error>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_REQUIRED' | translate }}</mat-error>
             }
           </mat-form-field>
 
-          <!-- Subject -->
           <mat-form-field appearance="outline">
             <mat-label>
-              <span class="step-number">2.</span> Subject
+              <span class="step-number">2.</span>
+              {{ 'TEST_FORM.FIELD_SUBJECT_LABEL' | translate }}
             </mat-label>
             <mat-select formControlName="subjectId" required [disabled]="!form.get('classLevelId')?.value">
               @if (subjects && subjects.length > 0) {
@@ -112,40 +133,43 @@
                   </mat-option>
                 }
               } @else if (form.get('classLevelId')?.value) {
-                <mat-option disabled>No subjects available for selected class level</mat-option>
+                <mat-option disabled>{{ 'TEST_FORM.FIELD_SUBJECT_EMPTY' | translate }}</mat-option>
               } @else {
-                <mat-option disabled>Select class level first</mat-option>
+                <mat-option disabled>{{ 'TEST_FORM.FIELD_SUBJECT_SELECT_CLASS' | translate }}</mat-option>
               }
             </mat-select>
             @if (form.get('classLevelId')?.value && subjects) {
-              <mat-hint>
-                <strong>Step 2:</strong> {{ subjects.length }} subject(s) available
-              </mat-hint>
+              <mat-hint>{{ 'TEST_FORM.FIELD_SUBJECT_HINT' | translate:{ count: subjects.length } }}</mat-hint>
             } @else {
               <mat-hint class="warning-hint">
-                ⚠ Please select class level first (Step 1)
+                {{ 'TEST_FORM.FIELD_SUBJECT_WARNING' | translate }}
               </mat-hint>
             }
             @if (form.get('subjectId')?.invalid && form.get('subjectId')?.touched) {
-              <mat-error>Subject is required</mat-error>
+              <mat-error>{{ 'TEST_FORM.FIELD_SUBJECT_REQUIRED' | translate }}</mat-error>
             }
           </mat-form-field>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Test Settings -->
     <mat-card class="section-card">
-      <mat-card-header>
-        <mat-icon class="section-icon">settings</mat-icon>
-        <mat-card-title>Test Settings</mat-card-title>
+      <mat-card-header class="section-header">
+        <div class="section-header-inner">
+          <div class="section-icon-wrap">
+            <mat-icon class="section-icon">settings</mat-icon>
+          </div>
+          <div>
+            <mat-card-title>{{ 'TEST_FORM.SECTION_SETTINGS_TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'TEST_FORM.SECTION_SETTINGS_SUBTITLE' | translate }}</mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-grid">
-          <!-- Duration -->
           <mat-form-field appearance="outline">
-            <mat-label>Duration (minutes)</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_DURATION_LABEL' | translate }}</mat-label>
             <input
               matInput
               type="number"
@@ -155,17 +179,14 @@
               max="240"
               required
             >
-            <mat-hint>
-              {{ formatDuration(form.get('durationSec')?.value || 3600) }}
-            </mat-hint>
+            <mat-hint>{{ formatDuration(form.get('durationSec')?.value || 3600) }}</mat-hint>
             @if (form.get('durationSec')?.invalid && form.get('durationSec')?.touched) {
-              <mat-error>Duration must be between 1 and 240 minutes</mat-error>
+              <mat-error>{{ 'TEST_FORM.FIELD_DURATION_ERROR' | translate }}</mat-error>
             }
           </mat-form-field>
 
-          <!-- Allowed Attempts -->
           <mat-form-field appearance="outline">
-            <mat-label>Allowed Attempts</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_ATTEMPTS_LABEL' | translate }}</mat-label>
             <input
               matInput
               type="number"
@@ -174,15 +195,14 @@
               max="10"
               required
             >
-            <mat-hint>How many times students can take this test</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_ATTEMPTS_HINT' | translate }}</mat-hint>
             @if (form.get('allowedAttempts')?.invalid && form.get('allowedAttempts')?.touched) {
-              <mat-error>Must be between 1 and 10</mat-error>
+              <mat-error>{{ 'TEST_FORM.FIELD_ATTEMPTS_ERROR' | translate }}</mat-error>
             }
           </mat-form-field>
 
-          <!-- Passing Percent -->
           <mat-form-field appearance="outline">
-            <mat-label>Passing Percentage</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_PASSING_LABEL' | translate }}</mat-label>
             <input
               matInput
               type="number"
@@ -192,29 +212,28 @@
               required
             >
             <span matTextSuffix>%</span>
-            <mat-hint>Minimum score to pass the test</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_PASSING_HINT' | translate }}</mat-hint>
             @if (form.get('passingPercent')?.invalid && form.get('passingPercent')?.touched) {
-              <mat-error>Must be between 0 and 100</mat-error>
+              <mat-error>{{ 'TEST_FORM.FIELD_PASSING_ERROR' | translate }}</mat-error>
             }
           </mat-form-field>
 
-          <!-- Review Policy -->
           <mat-form-field appearance="outline">
-            <mat-label>Review Policy</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_REVIEW_LABEL' | translate }}</mat-label>
             <mat-select formControlName="reviewPolicy" required>
               @for (policy of reviewPolicyOptions; track policy.value) {
                 <mat-option [value]="policy.value">
-                  {{ policy.label }}
+                  {{ ('TEST_FORM.REVIEW_OPTION_' + policy.value) | translate }}
                 </mat-option>
               }
             </mat-select>
             <mat-hint>
               @if (form.get('reviewPolicy')?.value === 'AFTER_SUBMIT') {
-                Students can review immediately after submitting
+                {{ 'TEST_FORM.REVIEW_HINT_AFTER_SUBMIT' | translate }}
               } @else if (form.get('reviewPolicy')?.value === 'AFTER_CLOSE') {
-                Students can review only after test closes
+                {{ 'TEST_FORM.REVIEW_HINT_AFTER_CLOSE' | translate }}
               } @else {
-                Students cannot review their answers
+                {{ 'TEST_FORM.REVIEW_HINT_NEVER' | translate }}
               }
             </mat-hint>
           </mat-form-field>
@@ -222,92 +241,99 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Scheduling -->
     <mat-card class="section-card">
-      <mat-card-header>
-        <mat-icon class="section-icon">schedule</mat-icon>
-        <mat-card-title>Scheduling (Optional)</mat-card-title>
+      <mat-card-header class="section-header">
+        <div class="section-header-inner">
+          <div class="section-icon-wrap">
+            <mat-icon class="section-icon">schedule</mat-icon>
+          </div>
+          <div>
+            <mat-card-title>{{ 'TEST_FORM.SECTION_SCHEDULE_TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'TEST_FORM.SECTION_SCHEDULE_SUBTITLE' | translate }}</mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
         <div class="form-grid">
-          <!-- Opens At -->
           <mat-form-field appearance="outline">
-            <mat-label>Opens At</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_OPENS_LABEL' | translate }}</mat-label>
             <input
               matInput
               [matDatepicker]="opensAtPicker"
               formControlName="opensAt"
-              placeholder="Select date and time"
+              [placeholder]="'TEST_FORM.FIELD_OPENS_PLACEHOLDER' | translate"
             >
             <mat-datepicker-toggle matIconSuffix [for]="opensAtPicker"></mat-datepicker-toggle>
             <mat-datepicker #opensAtPicker></mat-datepicker>
-            <mat-hint>When students can start taking the test</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_OPENS_HINT' | translate }}</mat-hint>
           </mat-form-field>
 
-          <!-- Closes At -->
           <mat-form-field appearance="outline">
-            <mat-label>Closes At</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_CLOSES_LABEL' | translate }}</mat-label>
             <input
               matInput
               [matDatepicker]="closesAtPicker"
               formControlName="closesAt"
-              placeholder="Select date and time"
+              [placeholder]="'TEST_FORM.FIELD_CLOSES_PLACEHOLDER' | translate"
             >
             <mat-datepicker-toggle matIconSuffix [for]="closesAtPicker"></mat-datepicker-toggle>
             <mat-datepicker #closesAtPicker></mat-datepicker>
-            <mat-hint>When students can no longer take the test</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_CLOSES_HINT' | translate }}</mat-hint>
           </mat-form-field>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Options -->
     <mat-card class="section-card">
-      <mat-card-header>
-        <mat-icon class="section-icon">tune</mat-icon>
-        <mat-card-title>Test Options</mat-card-title>
+      <mat-card-header class="section-header">
+        <div class="section-header-inner">
+          <div class="section-icon-wrap">
+            <mat-icon class="section-icon">tune</mat-icon>
+          </div>
+          <div>
+            <mat-card-title>{{ 'TEST_FORM.SECTION_OPTIONS_TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'TEST_FORM.SECTION_OPTIONS_SUBTITLE' | translate }}</mat-card-subtitle>
+          </div>
+        </div>
       </mat-card-header>
 
       <mat-card-content>
         <div class="options-container">
-          <!-- Shuffle Questions -->
           <div class="option-item">
             <mat-checkbox formControlName="shuffleQuestions">
-              Shuffle Questions
+              {{ 'TEST_FORM.OPTION_SHUFFLE_QUESTIONS' | translate }}
             </mat-checkbox>
             <span class="option-description">
-              Present questions in random order for each student
+              {{ 'TEST_FORM.OPTION_SHUFFLE_QUESTIONS_DESC' | translate }}
             </span>
           </div>
 
-          <!-- Shuffle Choices -->
           <div class="option-item">
             <mat-checkbox formControlName="shuffleChoices">
-              Shuffle Answer Choices
+              {{ 'TEST_FORM.OPTION_SHUFFLE_CHOICES' | translate }}
             </mat-checkbox>
             <span class="option-description">
-              Present answer choices in random order
+              {{ 'TEST_FORM.OPTION_SHUFFLE_CHOICES_DESC' | translate }}
             </span>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <!-- Actions -->
     <div class="actions-section">
       <div class="left-actions">
         @if (isEditMode) {
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="navigateToComposition()"
-            [disabled]="loading"
-            matTooltip="Edit test composition (questions)"
-          >
+        <button
+          mat-raised-button
+          class="aqyldy-btn-mint"
+          type="button"
+          (click)="navigateToComposition()"
+          [disabled]="loading"
+          [matTooltip]="'TEST_FORM.TOOLTIP_EDIT_QUESTIONS' | translate"
+        >
             <mat-icon>list</mat-icon>
-            Edit Questions
+            {{ 'TEST_FORM.ACTION_EDIT_QUESTIONS' | translate }}
           </button>
         }
 
@@ -318,10 +344,10 @@
             type="button"
             (click)="publish()"
             [disabled]="loading || form.invalid"
-            matTooltip="Publish test (cannot be edited after publishing)"
+            [matTooltip]="'TEST_FORM.TOOLTIP_PUBLISH' | translate"
           >
             <mat-icon>publish</mat-icon>
-            Publish
+            {{ 'TEST_FORM.ACTION_PUBLISH' | translate }}
           </button>
         }
       </div>
@@ -333,7 +359,7 @@
           (click)="goBack()"
           [disabled]="loading"
         >
-          Cancel
+          {{ 'TEST_FORM.ACTION_CANCEL' | translate }}
         </button>
 
         @if (isEditMode && !hasAttempts()) {
@@ -343,10 +369,10 @@
             type="button"
             (click)="delete()"
             [disabled]="loading"
-            matTooltip="Delete test"
+            [matTooltip]="'TEST_FORM.TOOLTIP_DELETE' | translate"
           >
             <mat-icon>delete</mat-icon>
-            Delete
+            {{ 'TEST_FORM.ACTION_DELETE' | translate }}
           </button>
         }
 
@@ -356,16 +382,16 @@
             color="warn"
             type="button"
             disabled
-            matTooltip="Cannot delete - test has student attempts"
+            [matTooltip]="'TEST_FORM.TOOLTIP_DELETE_DISABLED' | translate"
           >
             <mat-icon>delete</mat-icon>
-            Delete
+            {{ 'TEST_FORM.ACTION_DELETE' | translate }}
           </button>
         }
 
         <button
           mat-raised-button
-          color="primary"
+          class="aqyldy-btn-mint"
           type="submit"
           [disabled]="form.invalid || loading || isPublished()"
         >
