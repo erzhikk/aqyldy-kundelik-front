@@ -54,6 +54,7 @@
   },
   "SUBJECTS": {
     "TITLE": "Subjects",
+    "TITLE_SINGULAR": "Subject",
     "CREATE": "Create Subject",
     "EDIT": "Edit Subject",
     "NAME_RU": "Name (Russian)",
@@ -62,6 +63,66 @@
     "CLASS_LEVEL": "Class Level",
     "NO_SUBJECTS": "No subjects found",
     "SAVE_CHANGES": "Save Changes"
+  },
+  "SUBJECT": {
+    "NAME_RU_ERROR": "Subject name in Russian is required (min 2 characters)",
+    "NAME_KK_ERROR": "Subject name in Kazakh is required (min 2 characters)",
+    "NAME_EN_ERROR": "Subject name in English is required (min 2 characters)",
+    "CLASS_LEVEL_ERROR": "Class level is required",
+    "TOPICS": {
+      "TITLE": "Topics",
+      "TITLE_SINGULAR": "Topic",
+      "ADD": "Add Topic",
+      "CREATE_TITLE": "Create Topic",
+      "EDIT_TITLE": "Edit Topic",
+      "NAME": "Topic Name",
+      "NAME_PLACEHOLDER": "Enter topic name",
+      "NAME_ERROR": "Topic name is required (min 2 characters)",
+      "DESCRIPTION": "Description",
+      "DESCRIPTION_PLACEHOLDER": "Enter topic description (optional)",
+      "AUTHOR": "Author",
+      "QUESTIONS_COUNT": "Questions",
+      "SEARCH_PLACEHOLDER": "Search by topic name",
+      "NO_TOPICS": "No topics found",
+      "DELETE_SUCCESS": "Topic deleted successfully",
+      "DELETE_BLOCKED": "Cannot delete topic: it has questions",
+      "CONFIRM_DELETE": "Delete topic \"{{name}}\"? This action cannot be undone.",
+      "HAS_QUESTIONS": "Has questions"
+    }
+  },
+  "TOPIC": {
+    "DETAILS": {
+      "QUESTIONS_TITLE": "Questions",
+      "QUESTION": "Question",
+      "ANSWERS": "Answers",
+      "NO_QUESTIONS": "No questions found",
+      "NO_ANSWERS": "No answers found",
+      "VIEW_ANSWERS": "View answers",
+      "ADD_QUESTION": "Add Question"
+    }
+  },
+  "QUESTION": {
+    "CREATE_TITLE": "Create Question",
+    "EDIT_TITLE": "Edit Question",
+    "TEXT": "Question Text",
+    "TEXT_PLACEHOLDER": "Enter the question text",
+    "TEXT_ERROR": "Question text is required",
+    "EXPLANATION": "Explanation",
+    "EXPLANATION_PLACEHOLDER": "Optional explanation",
+    "DIFFICULTY": "Difficulty",
+    "DIFFICULTY_EASY": "Easy",
+    "DIFFICULTY_MEDIUM": "Medium",
+    "DIFFICULTY_HARD": "Hard",
+    "CHOICES": "Answers (4-5)",
+    "ADD_CHOICE": "Add Answer",
+    "CHOICE": "Answer",
+    "CHOICE_PLACEHOLDER": "Enter answer text",
+    "CHOICE_ERROR": "Answer text is required",
+    "CORRECT_REQUIRED": "Select the correct answer",
+    "CONFIRM_DELETE": "Delete this question? This action cannot be undone.",
+    "VIEW_TITLE": "View Question",
+    "STATUS": "Status",
+    "ANSWER_TEXT": "Answer Text"
   },
   "VALIDATION": {
     "REQUIRED": "This field is required",

@@ -8,6 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { TranslateModule } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { SubjectCreateComponent } from '../create/subject-create.component';
 import { SubjectEditComponent } from '../edit/subject-edit.component';
 import { TokenStorage } from '../../../core/auth/token-storage.service';
@@ -41,6 +42,7 @@ import { LanguageService } from '../../../core/i18n/language.service';
 export class SubjectsListComponent implements OnInit {
   private api = inject(SubjectsService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
   private tokens = inject(TokenStorage);
   languageService = inject(LanguageService);
 
@@ -117,6 +119,13 @@ export class SubjectsListComponent implements OnInit {
         this.load(); // Refresh the list
       }
     });
+  }
+
+  /**
+   * Navigate to subject card (view subject info and topics)
+   */
+  openCard(subject: SubjectDto): void {
+    this.router.navigate(['/app/subjects', subject.id, 'card']);
   }
 
   /**

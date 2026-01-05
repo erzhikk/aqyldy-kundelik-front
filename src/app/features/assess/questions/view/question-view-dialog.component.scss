@@ -1,0 +1,117 @@
+:host {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #d6e4f0;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --accent: #0f766e;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+}
+
+mat-dialog-content {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.question-section,
+.explanation-section,
+.answers-section {
+  margin-bottom: 1.5rem;
+}
+
+.question-label,
+.explanation-label,
+.answers-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.question-text {
+  font-size: 1.125rem;
+  color: var(--ink);
+  line-height: 1.6;
+  padding: 1rem;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+}
+
+.explanation-text {
+  color: var(--muted);
+  font-style: italic;
+  padding: 0.75rem;
+  background: var(--surface-2);
+  border-radius: 8px;
+}
+
+.answers-table {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+::ng-deep .answers-table {
+  .mat-mdc-header-row {
+    background: var(--surface-2);
+  }
+
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .mat-mdc-cell {
+    padding: 1rem 0.75rem;
+  }
+
+  .mat-mdc-row:hover {
+    background: var(--surface-2);
+  }
+}
+
+.status-icon {
+  font-size: 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+
+  &.correct {
+    color: #16a34a;
+  }
+
+  &.incorrect {
+    color: #ef4444;
+  }
+}
+
+.no-answers {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+mat-dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--line);
+}

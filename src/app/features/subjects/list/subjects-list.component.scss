@@ -111,6 +111,22 @@ table {
   margin: 0;
 }
 
+/* Subject name link styling */
+.subject-name-link {
+  color: var(--accent);
+  font-weight: 500;
+  text-align: left;
+  padding: 0;
+  min-width: auto;
+  text-transform: none;
+  letter-spacing: normal;
+
+  &:hover {
+    text-decoration: underline;
+    background: transparent;
+  }
+}
+
 /* Material table styling */
 ::ng-deep .mat-mdc-table {
   background: transparent;

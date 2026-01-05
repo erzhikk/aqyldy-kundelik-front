@@ -1,0 +1,31 @@
+<div mat-dialog-title>
+  <div class="dialog-subtitle">{{ 'SUBJECT.TOPICS.TITLE' | translate }}</div>
+  <h2 class="dialog-main-title">{{ data.subjectName }}</h2>
+  <div class="dialog-action">{{ data.mode === 'create' ? ('SUBJECT.TOPICS.CREATE_TITLE' | translate) : ('SUBJECT.TOPICS.EDIT_TITLE' | translate) }}</div>
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'SUBJECT.TOPICS.NAME' | translate }}</mat-label>
+        <input matInput formControlName="name" required [placeholder]="'SUBJECT.TOPICS.NAME_PLACEHOLDER' | translate">
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <mat-error>{{ 'SUBJECT.TOPICS.NAME_ERROR' | translate }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'SUBJECT.TOPICS.DESCRIPTION' | translate }}</mat-label>
+        <textarea matInput formControlName="description" rows="3" [placeholder]="'SUBJECT.TOPICS.DESCRIPTION_PLACEHOLDER' | translate"></textarea>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">{{ 'COMMON.CANCEL' | translate }}</button>
+  <button mat-raised-button class="aqyldy-btn-mint" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? ('COMMON.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+  </button>
+</mat-dialog-actions>

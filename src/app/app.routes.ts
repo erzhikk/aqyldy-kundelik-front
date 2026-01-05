@@ -42,6 +42,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/subjects/list/subjects-list.component').then(m => m.SubjectsListComponent)
       },
       {
+        path: 'subjects/:id/card',
+        loadComponent: () => import('./features/subjects/card/subject-card.component').then(m => m.SubjectCardComponent)
+      },
+      {
+        path: 'subjects/:subjectId/topics/:topicId',
+        loadComponent: () => import('./features/assess/topics/details/topic-details.component').then(m => m.TopicDetailsComponent)
+      },
+      {
         path: 'timetable',
         loadComponent: () => import('./features/timetable/list/timetable-list.component').then(m => m.TimetableListComponent)
       },

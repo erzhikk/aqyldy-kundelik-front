@@ -54,6 +54,7 @@
   },
   "SUBJECTS": {
     "TITLE": "Пәндер",
+    "TITLE_SINGULAR": "Пән",
     "CREATE": "Пән жасау",
     "EDIT": "Пәнді өңдеу",
     "NAME_RU": "Атауы (Орыс)",
@@ -62,6 +63,66 @@
     "CLASS_LEVEL": "Сынып деңгейі",
     "NO_SUBJECTS": "Пәндер табылмады",
     "SAVE_CHANGES": "Өзгерістерді сақтау"
+  },
+  "SUBJECT": {
+    "NAME_RU_ERROR": "Орыс тіліндегі атау міндетті (кемінде 2 таңба)",
+    "NAME_KK_ERROR": "Қазақ тіліндегі атау міндетті (кемінде 2 таңба)",
+    "NAME_EN_ERROR": "Ағылшын тіліндегі атау міндетті (кемінде 2 таңба)",
+    "CLASS_LEVEL_ERROR": "Сынып деңгейі міндетті",
+    "TOPICS": {
+      "TITLE": "Тақырыптар",
+      "TITLE_SINGULAR": "Тақырып",
+      "ADD": "Тақырып қосу",
+      "CREATE_TITLE": "Тақырып құру",
+      "EDIT_TITLE": "Тақырыпты өңдеу",
+      "NAME": "Тақырып атауы",
+      "NAME_PLACEHOLDER": "Тақырып атауын енгізіңіз",
+      "NAME_ERROR": "Тақырып атауы міндетті (кемінде 2 таңба)",
+      "DESCRIPTION": "Сипаттама",
+      "DESCRIPTION_PLACEHOLDER": "Тақырып сипаттамасын енгізіңіз (міндетті емес)",
+      "AUTHOR": "Автор",
+      "QUESTIONS_COUNT": "Сұрақтар",
+      "SEARCH_PLACEHOLDER": "Тақырып атауы бойынша іздеу",
+      "NO_TOPICS": "Тақырыптар табылмады",
+      "DELETE_SUCCESS": "Тақырып сәтті жойылды",
+      "DELETE_BLOCKED": "Тақырыпты жоюға болмайды: онда сұрақтар бар",
+      "CONFIRM_DELETE": "\"{{name}}\" тақырыбын жоюсыз ба? Бұл әрекетті болдырмауға болмайды.",
+      "HAS_QUESTIONS": "Сұрақтары бар"
+    }
+  },
+  "TOPIC": {
+    "DETAILS": {
+      "QUESTIONS_TITLE": "Сұрақтар",
+      "QUESTION": "Сұрақ",
+      "ANSWERS": "Жауаптар",
+      "NO_QUESTIONS": "Сұрақтар табылмады",
+      "NO_ANSWERS": "Жауаптар табылмады",
+      "VIEW_ANSWERS": "Жауаптарды қарау",
+      "ADD_QUESTION": "Сұрақ қосу"
+    }
+  },
+  "QUESTION": {
+    "CREATE_TITLE": "Сұрақ құру",
+    "EDIT_TITLE": "Сұрақты өңдеу",
+    "TEXT": "Сұрақ мәтіні",
+    "TEXT_PLACEHOLDER": "Сұрақ мәтінін енгізіңіз",
+    "TEXT_ERROR": "Сұрақ мәтіні міндетті",
+    "EXPLANATION": "Түсіндірме",
+    "EXPLANATION_PLACEHOLDER": "Түсіндірме (міндетті емес)",
+    "DIFFICULTY": "Қиындық",
+    "DIFFICULTY_EASY": "Оңай",
+    "DIFFICULTY_MEDIUM": "Орташа",
+    "DIFFICULTY_HARD": "Қиын",
+    "CHOICES": "Жауаптар (4-5)",
+    "ADD_CHOICE": "Жауап қосу",
+    "CHOICE": "Жауап",
+    "CHOICE_PLACEHOLDER": "Жауап мәтінін енгізіңіз",
+    "CHOICE_ERROR": "Жауап мәтіні міндетті",
+    "CORRECT_REQUIRED": "Дұрыс жауапты таңдаңыз",
+    "CONFIRM_DELETE": "Бұл сұрақты жою керек пе? Бұл әрекетті қайтару мүмкін емес.",
+    "VIEW_TITLE": "Сұрақты қарау",
+    "STATUS": "Мәртебе",
+    "ANSWER_TEXT": "Жауап мәтіні"
   },
   "VALIDATION": {
     "REQUIRED": "Бұл өріс міндетті",

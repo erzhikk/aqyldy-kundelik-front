@@ -1,0 +1,81 @@
+<div mat-dialog-title>
+  <div class="dialog-subtitle">{{ 'TOPIC.DETAILS.QUESTIONS_TITLE' | translate }}</div>
+  <h2 class="dialog-main-title">{{ data.topicName }}</h2>
+  <div class="dialog-action">{{ 'QUESTION.CREATE_TITLE' | translate }}</div>
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'QUESTION.TEXT' | translate }}</mat-label>
+        <textarea matInput formControlName="text" rows="3" [placeholder]="'QUESTION.TEXT_PLACEHOLDER' | translate"></textarea>
+        @if (form.get('text')?.invalid && form.get('text')?.touched) {
+          <mat-error>{{ 'QUESTION.TEXT_ERROR' | translate }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'QUESTION.EXPLANATION' | translate }}</mat-label>
+        <textarea matInput formControlName="explanation" rows="2" [placeholder]="'QUESTION.EXPLANATION_PLACEHOLDER' | translate"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="form-grid two-cols">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'QUESTION.DIFFICULTY' | translate }}</mat-label>
+        <mat-select formControlName="difficulty">
+          @for (level of difficulties; track level) {
+            <mat-option [value]="level">{{ ('QUESTION.DIFFICULTY_' + level) | translate }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="choices-section">
+      <div class="choices-header">
+        <h3>{{ 'QUESTION.CHOICES' | translate }}</h3>
+        <button mat-stroked-button type="button" (click)="addChoice()" [disabled]="choices.length >= 5">
+          <mat-icon>add</mat-icon>
+          {{ 'QUESTION.ADD_CHOICE' | translate }}
+        </button>
+      </div>
+
+      <mat-radio-group formControlName="correctIndex" class="choices-list">
+        <div formArrayName="choices">
+          @for (choice of choices.controls; track $index; let i = $index) {
+            <div class="choice-row" [formGroupName]="i">
+              <mat-radio-button [value]="i"></mat-radio-button>
+              <mat-form-field appearance="outline" class="choice-field">
+                <mat-label>{{ 'QUESTION.CHOICE' | translate }} {{ i + 1 }}</mat-label>
+                <input matInput formControlName="text" [placeholder]="'QUESTION.CHOICE_PLACEHOLDER' | translate">
+                @if (choice.get('text')?.invalid && choice.get('text')?.touched) {
+                  <mat-error>{{ 'QUESTION.CHOICE_ERROR' | translate }}</mat-error>
+                }
+              </mat-form-field>
+              <button
+                mat-icon-button
+                color="warn"
+                type="button"
+                (click)="removeChoice(i)"
+                [disabled]="choices.length <= 4">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </mat-radio-group>
+
+      @if (form.get('correctIndex')?.invalid && form.get('correctIndex')?.touched) {
+        <div class="choice-error">{{ 'QUESTION.CORRECT_REQUIRED' | translate }}</div>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">{{ 'COMMON.CANCEL' | translate }}</button>
+  <button mat-raised-button class="aqyldy-btn-mint" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? ('COMMON.CREATING' | translate) : ('COMMON.CREATE' | translate) }}
+  </button>
+</mat-dialog-actions>

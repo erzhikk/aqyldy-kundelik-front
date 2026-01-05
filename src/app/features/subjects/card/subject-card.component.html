@@ -1,0 +1,131 @@
+<div class="subject-card-container">
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @else if (error()) {
+    <div class="error-container">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-raised-button class="aqyldy-btn-mint" (click)="goBack()">
+        {{ 'COMMON.CLOSE' | translate }}
+      </button>
+    </div>
+  }
+
+  <!-- Subject card -->
+  @else if (subject()) {
+    <!-- Header with back button -->
+    <div class="card-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>{{ 'SUBJECTS.TITLE_SINGULAR' | translate }} - {{ subject()!.nameRu }}</h2>
+    </div>
+
+    <!-- Subject Information -->
+    <mat-card class="subject-info-card">
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">{{ 'SUBJECTS.NAME_RU' | translate }}</span>
+            <span class="value">{{ subject()!.nameRu }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">{{ 'SUBJECTS.NAME_KK' | translate }}</span>
+            <span class="value">{{ subject()!.nameKk }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">{{ 'SUBJECTS.NAME_EN' | translate }}</span>
+            <span class="value">{{ subject()!.nameEn }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">{{ 'SUBJECTS.CLASS_LEVEL' | translate }}</span>
+            <span class="value">{{ subject()!.classLevel.nameRu }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Topics Section -->
+    <mat-card class="topics-card">
+      <mat-card-content>
+        <h3 class="section-title">{{ 'SUBJECT.TOPICS.TITLE' | translate }}</h3>
+
+        <!-- Search and Add button -->
+        <div class="topics-header">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>{{ 'COMMON.SEARCH' | translate }}</mat-label>
+            <input matInput [(ngModel)]="topicsQuery" (keyup.enter)="searchTopics()" [placeholder]="'SUBJECT.TOPICS.SEARCH_PLACEHOLDER' | translate">
+            <button mat-icon-button matSuffix (click)="searchTopics()" type="button">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+          <button mat-raised-button class="aqyldy-btn-mint" (click)="addTopic()">
+            <mat-icon>add</mat-icon>
+            {{ 'SUBJECT.TOPICS.ADD' | translate }}
+          </button>
+        </div>
+
+        <!-- Topics table -->
+        @if (topicsLoading) {
+          <div class="loading-state">{{ 'COMMON.LOADING' | translate }}</div>
+        } @else if (topics.length === 0) {
+          <div class="empty-state">{{ 'SUBJECT.TOPICS.NO_TOPICS' | translate }}</div>
+        } @else {
+          <table mat-table [dataSource]="topics" class="topics-table">
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT.TOPICS.NAME' | translate }}</th>
+              <td mat-cell *matCellDef="let topic">
+                <button mat-button class="topic-name-link" (click)="openTopic(topic)">
+                  {{ topic.name }}
+                </button>
+              </td>
+            </ng-container>
+
+            <!-- Author Column -->
+            <ng-container matColumnDef="author">
+              <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT.TOPICS.AUTHOR' | translate }}</th>
+              <td mat-cell *matCellDef="let topic">{{ topic.createdByFullName || '—' }}</td>
+            </ng-container>
+
+            <!-- Questions Count Column -->
+            <ng-container matColumnDef="questionsCount">
+              <th mat-header-cell *matHeaderCellDef>{{ 'SUBJECT.TOPICS.QUESTIONS_COUNT' | translate }}</th>
+              <td mat-cell *matCellDef="let topic">{{ topic.questionsCount || 0 }}</td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.ACTIONS' | translate }}</th>
+              <td mat-cell *matCellDef="let topic">
+                <button mat-icon-button
+                        color="primary"
+                        (click)="editTopic(topic)"
+                        [matTooltip]="'COMMON.EDIT' | translate">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        color="warn"
+                        (click)="deleteTopic(topic)"
+                        [disabled]="!canDeleteTopic(topic)"
+                        [matTooltip]="getDeleteTooltip(topic)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

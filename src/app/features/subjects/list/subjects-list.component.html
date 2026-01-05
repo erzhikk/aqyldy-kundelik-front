@@ -22,7 +22,11 @@
         <!-- Name Column -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> {{ 'COMMON.NAME' | translate }} </th>
-          <td mat-cell *matCellDef="let s"> {{ getSubjectName(s) }} </td>
+          <td mat-cell *matCellDef="let s">
+            <button mat-button class="subject-name-link" (click)="openCard(s)">
+              {{ getSubjectName(s) }}
+            </button>
+          </td>
         </ng-container>
 
         <!-- Class Level Column -->

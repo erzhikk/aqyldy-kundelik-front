@@ -17,6 +17,7 @@ export interface ChoiceDto {
   text: string;
   isCorrect: boolean;
   order: number;
+  mediaId?: string | null;
 }
 
 /**
@@ -29,6 +30,8 @@ export interface QuestionDto {
   topic?: TopicDto;
   difficulty: QuestionDifficulty;
   choices: ChoiceDto[];
+  explanation?: string | null;
+  mediaId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,6 +44,8 @@ export interface CreateQuestionBody {
   topicId: string;
   difficulty: QuestionDifficulty;
   choices: ChoiceDto[];
+  explanation?: string | null;
+  mediaId?: string | null;
 }
 
 /**
@@ -51,6 +56,8 @@ export interface UpdateQuestionBody {
   topicId?: string;
   difficulty?: QuestionDifficulty;
   choices?: ChoiceDto[];
+  explanation?: string | null;
+  mediaId?: string | null;
 }
 
 /**

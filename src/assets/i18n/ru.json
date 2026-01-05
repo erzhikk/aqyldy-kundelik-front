@@ -54,6 +54,7 @@
   },
   "SUBJECTS": {
     "TITLE": "Предметы",
+    "TITLE_SINGULAR": "Предмет",
     "CREATE": "Создать предмет",
     "EDIT": "Редактировать предмет",
     "NAME_RU": "Название (Русский)",
@@ -62,6 +63,66 @@
     "CLASS_LEVEL": "Уровень класса",
     "NO_SUBJECTS": "Предметы не найдены",
     "SAVE_CHANGES": "Сохранить изменения"
+  },
+  "SUBJECT": {
+    "NAME_RU_ERROR": "Название на русском обязательно (минимум 2 символа)",
+    "NAME_KK_ERROR": "Название на казахском обязательно (минимум 2 символа)",
+    "NAME_EN_ERROR": "Название на английском обязательно (минимум 2 символа)",
+    "CLASS_LEVEL_ERROR": "Уровень класса обязателен",
+    "TOPICS": {
+      "TITLE": "Темы",
+      "TITLE_SINGULAR": "Тема",
+      "ADD": "Добавить тему",
+      "CREATE_TITLE": "Создать тему",
+      "EDIT_TITLE": "Редактировать тему",
+      "NAME": "Название темы",
+      "NAME_PLACEHOLDER": "Введите название темы",
+      "NAME_ERROR": "Название темы обязательно (минимум 2 символа)",
+      "DESCRIPTION": "Описание",
+      "DESCRIPTION_PLACEHOLDER": "Введите описание темы (необязательно)",
+      "AUTHOR": "Автор",
+      "QUESTIONS_COUNT": "Вопросов",
+      "SEARCH_PLACEHOLDER": "Поиск по названию темы",
+      "NO_TOPICS": "Темы не найдены",
+      "DELETE_SUCCESS": "Тема успешно удалена",
+      "DELETE_BLOCKED": "Невозможно удалить тему: она содержит вопросы",
+      "CONFIRM_DELETE": "Удалить тему \"{{name}}\"? Это действие нельзя отменить.",
+      "HAS_QUESTIONS": "Есть вопросы"
+    }
+  },
+  "TOPIC": {
+    "DETAILS": {
+      "QUESTIONS_TITLE": "Вопросы",
+      "QUESTION": "Вопрос",
+      "ANSWERS": "Ответы",
+      "NO_QUESTIONS": "Вопросы не найдены",
+      "NO_ANSWERS": "Ответы не найдены",
+      "VIEW_ANSWERS": "Посмотреть ответы",
+      "ADD_QUESTION": "Добавить вопрос"
+    }
+  },
+  "QUESTION": {
+    "CREATE_TITLE": "Создать вопрос",
+    "EDIT_TITLE": "Редактировать вопрос",
+    "TEXT": "Текст вопроса",
+    "TEXT_PLACEHOLDER": "Введите текст вопроса",
+    "TEXT_ERROR": "Текст вопроса обязателен",
+    "EXPLANATION": "Пояснение",
+    "EXPLANATION_PLACEHOLDER": "Пояснение (необязательно)",
+    "DIFFICULTY": "Сложность",
+    "DIFFICULTY_EASY": "Легкий",
+    "DIFFICULTY_MEDIUM": "Средний",
+    "DIFFICULTY_HARD": "Сложный",
+    "CHOICES": "Ответы (4-5)",
+    "ADD_CHOICE": "Добавить ответ",
+    "CHOICE": "Ответ",
+    "CHOICE_PLACEHOLDER": "Введите текст ответа",
+    "CHOICE_ERROR": "Текст ответа обязателен",
+    "CORRECT_REQUIRED": "Выберите правильный ответ",
+    "CONFIRM_DELETE": "Удалить этот вопрос? Действие нельзя отменить.",
+    "VIEW_TITLE": "Просмотр вопроса",
+    "STATUS": "Статус",
+    "ANSWER_TEXT": "Текст ответа"
   },
   "VALIDATION": {
     "REQUIRED": "Это поле обязательно",

@@ -1,0 +1,54 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>{{ 'QUESTION.VIEW_TITLE' | translate }}</h2>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <div class="question-section">
+    <div class="question-label">{{ 'TOPIC.DETAILS.QUESTION' | translate }}</div>
+    <div class="question-text">{{ data.question.text }}</div>
+  </div>
+
+  @if (data.question.explanation) {
+    <div class="explanation-section">
+      <div class="explanation-label">{{ 'QUESTION.EXPLANATION' | translate }}</div>
+      <div class="explanation-text">{{ data.question.explanation }}</div>
+    </div>
+  }
+
+  <div class="answers-section">
+    <div class="answers-label">{{ 'TOPIC.DETAILS.ANSWERS' | translate }}</div>
+
+    @if (data.question.choices && data.question.choices.length > 0) {
+      <table mat-table [dataSource]="data.question.choices" class="answers-table">
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>{{ 'QUESTION.STATUS' | translate }}</th>
+          <td mat-cell *matCellDef="let choice">
+            <mat-icon
+              class="status-icon"
+              [class.correct]="choice.isCorrect"
+              [class.incorrect]="!choice.isCorrect">
+              {{ choice.isCorrect ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="text">
+          <th mat-header-cell *matHeaderCellDef>{{ 'QUESTION.ANSWER_TEXT' | translate }}</th>
+          <td mat-cell *matCellDef="let choice">{{ choice.text }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    } @else {
+      <div class="no-answers">{{ 'TOPIC.DETAILS.NO_ANSWERS' | translate }}</div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">{{ 'COMMON.CLOSE' | translate }}</button>
+</mat-dialog-actions>
