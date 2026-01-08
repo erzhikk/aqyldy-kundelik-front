@@ -9,14 +9,34 @@ import { SubjectDto } from '../../subjects/subjects.service';
  */
 export interface TestDto {
   id: string;
-  title: string;
+  name?: string;
+  title?: string;
   description: string | null;
   subjectId: string;
+  subjectNameRu?: string;
+  subjectNameKk?: string;
+  subjectNameEn?: string;
   subject?: SubjectDto;
-  grade: number;
-  published: boolean;
-  hasAttempts: boolean;
+  classLevel?: number;
+  grade?: number;
+  published?: boolean;
+  status?: string;
+  hasAttempts?: boolean;
   maxScore?: number;
+  durationSec?: number;
+  allowedAttempts?: number;
+  passingPercent?: number;
+  reviewPolicy?: ReviewPolicy;
+  shuffleQuestions?: boolean;
+  shuffleChoices?: boolean;
+  opensAt?: string | null;
+  closesAt?: string | null;
+  schoolClasses?: {
+    id: string;
+    code: string;
+    classLevel: number;
+  }[];
+  questions?: TestQuestionDto[];
   createdAt: string;
   updatedAt: string;
 }
@@ -65,7 +85,7 @@ export interface CreateTestBody {
   name: string;
   description?: string | null;
   subjectId: string;
-  classLevelId: string;
+  schoolClassIds: string[];
   durationSec: number;
   allowedAttempts: number;
   opensAt?: string | null;
@@ -83,7 +103,7 @@ export interface UpdateTestBody {
   name?: string;
   description?: string | null;
   subjectId?: string;
-  classLevelId?: string;
+  schoolClassIds?: string[];
   durationSec?: number;
   allowedAttempts?: number;
   opensAt?: string | null;

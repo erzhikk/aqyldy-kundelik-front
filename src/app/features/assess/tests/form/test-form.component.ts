@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestsService, TestDto, CreateTestBody, UpdateTestBody, ReviewPolicy } from '../tests.service';
-import { SubjectsService, SubjectDto, ClassLevelDto } from '../../../subjects/subjects.service';
+import { SubjectsService, SubjectDto } from '../../../subjects/subjects.service';
+import { ClassesService, ClassDto } from '../../../classes/classes.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -61,6 +62,7 @@ export class TestFormComponent implements OnInit {
   private router = inject(Router);
   private testsApi = inject(TestsService);
   private subjectsApi = inject(SubjectsService);
+  private classesApi = inject(ClassesService);
   private notify = inject(NotifyService);
   private translate = inject(TranslateService);
 
@@ -70,7 +72,7 @@ export class TestFormComponent implements OnInit {
   testId: string | null = null;
   currentTest: TestDto | null = null;
   subjects: SubjectDto[] = [];
-  classLevels: ClassLevelDto[] = [];
+  schoolClasses: ClassDto[] = [];
 
   // Review policy options
   reviewPolicyOptions: { value: ReviewPolicy; label: string; description: string }[] = [
@@ -101,12 +103,14 @@ export class TestFormComponent implements OnInit {
       // Basic info
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       description: ['', [Validators.maxLength(1000)]],
-      classLevelId: ['', [Validators.required]],
+      schoolClassIds: [[], [Validators.required, Validators.minLength(1)]],
       subjectId: ['', [Validators.required]],
 
       // Scheduling
       opensAt: [null],
+      opensTime: [''],
       closesAt: [null],
+      closesTime: [''],
 
       // Test settings
       durationSec: [3600, [Validators.required, Validators.min(60), Validators.max(14400)]],
@@ -117,15 +121,11 @@ export class TestFormComponent implements OnInit {
       shuffleQuestions: [false],
       shuffleChoices: [false],
       reviewPolicy: ['AFTER_SUBMIT' as ReviewPolicy, [Validators.required]]
-    });
+    }, { validators: this.validateTestSchedule.bind(this) });
 
-    // Load class levels
-    this.loadClassLevels();
-
-    // Watch classLevel changes to load subjects
-    this.form.get('classLevelId')?.valueChanges.subscribe((classLevelId) => {
-      this.loadSubjectsByClassLevel(classLevelId);
-    });
+    // Load school classes and subjects
+    this.loadSchoolClasses();
+    this.loadSubjects();
 
     // Load test data if in edit mode
     if (this.isEditMode && this.testId) {
@@ -134,57 +134,36 @@ export class TestFormComponent implements OnInit {
   }
 
   /**
-   * Load class levels for dropdown
+   * Load school classes for dropdown
    */
-  loadClassLevels(): void {
-    this.subjectsApi.getClassLevels().subscribe({
-      next: (classLevels) => {
-        this.classLevels = classLevels;
+  loadSchoolClasses(): void {
+    this.classesApi.listAll().subscribe({
+      next: (schoolClasses) => {
+        this.schoolClasses = schoolClasses;
       },
       error: (err) => {
-        console.error('Error loading class levels:', err);
-        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_CLASS_LEVELS_FAIL'));
-        this.classLevels = [];
+        console.error('Error loading school classes:', err);
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SCHOOL_CLASSES_FAIL'));
+        this.schoolClasses = [];
       }
     });
   }
 
   /**
-   * Load subjects by class level from API
-   *
-   * Flow:
-   * 1. User selects Class Level (e.g., Grade 5)
-   * 2. Load subjects for that class level from backend (GET /api/subjects/by-class-level/{id})
-   * 3. Preserve subject selection if it exists in the new list (for edit mode)
-   * 4. Clear subject selection if it doesn't exist in the new list
+   * Load all subjects from API
    */
-  loadSubjectsByClassLevel(classLevelId: string | null): void {
-    if (!classLevelId) {
-      this.subjects = [];
-      this.form.patchValue({ subjectId: '' });
-      return;
-    }
-
-    this.subjectsApi.getByClassLevel(classLevelId).subscribe({
-      next: (subjects) => {
+  loadSubjects(): void {
+    this.subjectsApi.list().subscribe({
+      next: (response: any) => {
+        // Handle both array and paginated response
+        const subjects = Array.isArray(response)
+          ? response
+          : (response?.content ?? response?.data ?? []);
         this.subjects = subjects;
-
-        // Clear subject selection when class level changes
-        // But only if current subject is not in the new list (for edit mode)
-        const currentSubjectId = this.form.get('subjectId')?.value;
-        if (currentSubjectId) {
-          const isSubjectAvailable = subjects.some(s => s.id === currentSubjectId);
-          if (!isSubjectAvailable) {
-            this.form.patchValue({ subjectId: '' });
-          }
-        } else {
-          this.form.patchValue({ subjectId: '' });
-        }
       },
       error: () => {
         this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SUBJECTS_FAIL'));
         this.subjects = [];
-        this.form.patchValue({ subjectId: '' });
       }
     });
   }
@@ -198,18 +177,37 @@ export class TestFormComponent implements OnInit {
       next: (test: any) => {
         this.currentTest = test;
 
-        // Find classLevelId from subject
-        const subject = test.subject;
-        const classLevelId = subject?.classLevel?.id || test.classLevelId || '';
+        // Extract schoolClassIds from test (assuming API returns it)
+        const schoolClassIds = test.schoolClassIds || (test.schoolClasses || []).map((schoolClass: ClassDto) => schoolClass.id) || [];
+
+        // Extract time from opensAt
+        let opensTime = '';
+        let opensDate = null;
+        if (test.opensAt) {
+          const opensDateTime = new Date(test.opensAt);
+          opensDate = opensDateTime;
+          opensTime = this.formatTimeForInput(opensDateTime);
+        }
+
+        // Extract time from closesAt
+        let closesTime = '';
+        let closesDate = null;
+        if (test.closesAt) {
+          const closesDateTime = new Date(test.closesAt);
+          closesDate = closesDateTime;
+          closesTime = this.formatTimeForInput(closesDateTime);
+        }
 
         // Set form values
         this.form.patchValue({
           name: test.name || test.title || '',
           description: test.description || '',
-          classLevelId: classLevelId,
+          schoolClassIds: schoolClassIds,
           subjectId: test.subjectId,
-          opensAt: test.opensAt ? new Date(test.opensAt) : null,
-          closesAt: test.closesAt ? new Date(test.closesAt) : null,
+          opensAt: opensDate,
+          opensTime: opensTime,
+          closesAt: closesDate,
+          closesTime: closesTime,
           durationSec: test.durationSec || 3600,
           allowedAttempts: test.allowedAttempts || 1,
           passingPercent: test.passingPercent || 70,
@@ -219,7 +217,7 @@ export class TestFormComponent implements OnInit {
         });
 
         // Disable form if published
-        if (test.published) {
+        if (test.published === true || test.status === 'PUBLISHED') {
           this.form.disable();
         }
 
@@ -238,7 +236,9 @@ export class TestFormComponent implements OnInit {
    * Check if test is published
    */
   isPublished(): boolean {
-    return this.currentTest?.published || false;
+    if (!this.currentTest) return false;
+    if (typeof this.currentTest.published === 'boolean') return this.currentTest.published;
+    return this.currentTest.status === 'PUBLISHED';
   }
 
   /**
@@ -262,17 +262,31 @@ export class TestFormComponent implements OnInit {
     this.loading = true;
     const formValue = this.form.value;
 
+    // Combine date and time for opensAt
+    let opensAtISO: string | null = null;
+    if (formValue.opensAt && formValue.opensTime) {
+      const opensDateTime = this.combineDateAndTime(formValue.opensAt, formValue.opensTime);
+      opensAtISO = opensDateTime ? opensDateTime.toISOString() : null;
+    }
+
+    // Combine date and time for closesAt
+    let closesAtISO: string | null = null;
+    if (formValue.closesAt && formValue.closesTime) {
+      const closesDateTime = this.combineDateAndTime(formValue.closesAt, formValue.closesTime);
+      closesAtISO = closesDateTime ? closesDateTime.toISOString() : null;
+    }
+
     if (this.isEditMode && this.testId) {
       // Update existing test
       const body: UpdateTestBody = {
         name: formValue.name,
         description: formValue.description || null,
         subjectId: formValue.subjectId,
-        classLevelId: formValue.classLevelId,
+        schoolClassIds: formValue.schoolClassIds,
         durationSec: formValue.durationSec,
         allowedAttempts: formValue.allowedAttempts,
-        opensAt: formValue.opensAt ? new Date(formValue.opensAt).toISOString() : null,
-        closesAt: formValue.closesAt ? new Date(formValue.closesAt).toISOString() : null,
+        opensAt: opensAtISO,
+        closesAt: closesAtISO,
         shuffleQuestions: formValue.shuffleQuestions,
         shuffleChoices: formValue.shuffleChoices,
         passingPercent: formValue.passingPercent,
@@ -296,11 +310,11 @@ export class TestFormComponent implements OnInit {
         name: formValue.name,
         description: formValue.description || null,
         subjectId: formValue.subjectId,
-        classLevelId: formValue.classLevelId,
+        schoolClassIds: formValue.schoolClassIds,
         durationSec: formValue.durationSec,
         allowedAttempts: formValue.allowedAttempts,
-        opensAt: formValue.opensAt ? new Date(formValue.opensAt).toISOString() : null,
-        closesAt: formValue.closesAt ? new Date(formValue.closesAt).toISOString() : null,
+        opensAt: opensAtISO,
+        closesAt: closesAtISO,
         shuffleQuestions: formValue.shuffleQuestions,
         shuffleChoices: formValue.shuffleChoices,
         passingPercent: formValue.passingPercent,
@@ -404,6 +418,71 @@ export class TestFormComponent implements OnInit {
       return this.translate.instant(this.isEditMode ? 'TEST_FORM.ACTION_UPDATING' : 'TEST_FORM.ACTION_CREATING');
     }
     return this.translate.instant(this.isEditMode ? 'TEST_FORM.ACTION_UPDATE' : 'TEST_FORM.ACTION_CREATE');
+  }
+
+  /**
+   * Custom validator to check test schedule respects duration
+   */
+  validateTestSchedule(formGroup: FormGroup): { [key: string]: any } | null {
+    const opensAt = formGroup.get('opensAt')?.value;
+    const opensTime = formGroup.get('opensTime')?.value;
+    const closesAt = formGroup.get('closesAt')?.value;
+    const closesTime = formGroup.get('closesTime')?.value;
+    const durationSec = formGroup.get('durationSec')?.value;
+
+    // If any field is missing, skip validation
+    if (!opensAt || !opensTime || !closesAt || !closesTime || !durationSec) {
+      return null;
+    }
+
+    // Combine date and time into full datetime
+    const opensDateTime = this.combineDateAndTime(opensAt, opensTime);
+    const closesDateTime = this.combineDateAndTime(closesAt, closesTime);
+
+    if (!opensDateTime || !closesDateTime) {
+      return null;
+    }
+
+    // Calculate time difference in seconds
+    const diffMs = closesDateTime.getTime() - opensDateTime.getTime();
+    const diffSec = Math.floor(diffMs / 1000);
+
+    // Check if close time is at least durationSec after open time
+    if (diffSec < durationSec) {
+      return {
+        scheduleInvalid: {
+          message: 'Close time must be at least the test duration after open time',
+          required: durationSec,
+          actual: diffSec
+        }
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Combine date and time strings into Date object
+   */
+  combineDateAndTime(date: Date | string, time: string): Date | null {
+    if (!date || !time) return null;
+
+    const dateObj = new Date(date);
+    const [hours, minutes] = time.split(':').map(Number);
+
+    if (isNaN(hours) || isNaN(minutes)) return null;
+
+    dateObj.setHours(hours, minutes, 0, 0);
+    return dateObj;
+  }
+
+  /**
+   * Format Date object to HH:MM for time input
+   */
+  formatTimeForInput(date: Date): string {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { TestsService, TestDto, TestListParams } from '../tests.service';
@@ -35,6 +35,7 @@ import { TokenStorage } from '../../../../core/auth/token-storage.service';
   styleUrls: ['./tests-list.component.scss'],
   imports: [
     CommonModule,
+    RouterModule,
     ReactiveFormsModule,
     MatTableModule,
     MatIconModule,
@@ -255,5 +256,10 @@ export class TestsListComponent implements OnInit {
   getSubjectName(subjectId: string): string {
     const subject = this._subjects().find(s => s.id === subjectId);
     return subject?.nameRu || subject?.nameEn || 'Unknown';
+  }
+
+  isTestPublished(test: TestDto): boolean {
+    if (typeof test.published === 'boolean') return test.published;
+    return test.status === 'PUBLISHED';
   }
 }

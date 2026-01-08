@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { ClassesService, ClassDto, UpdateClassBody } from '../classes.service';
 import { UsersService, UserDto } from '../../users/users.service';
+import { SubjectsService, ClassLevelDto } from '../../subjects/subjects.service';
 
 const LANG_OPTIONS = ['kaz', 'rus', 'eng'];
 
@@ -31,9 +32,11 @@ export class ClassEditComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<ClassEditComponent>);
   private api = inject(ClassesService);
   private usersService = inject(UsersService);
+  private subjectsService = inject(SubjectsService);
 
   langOptions = LANG_OPTIONS;
   teachers: UserDto[] = [];
+  classLevels: ClassLevelDto[] = [];
   loading = false;
   form!: FormGroup;
 
@@ -42,6 +45,7 @@ export class ClassEditComponent implements OnInit {
     // Only editable fields: code, langType, classTeacherId
     this.form = this.fb.group({
       code: [data.code, [Validators.required, Validators.maxLength(3)]],
+      classLevelId: [data.classLevelId ?? null, [Validators.required]],
       langType: [data.langType, [Validators.required]],
       classTeacherId: [data.classTeacherId || '']
     });
@@ -49,19 +53,35 @@ export class ClassEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTeachers();
+    this.loadClassLevels();
   }
 
   /**
    * Load list of teachers (users with TEACHER role)
    */
   loadTeachers(): void {
-    this.usersService.list().subscribe({
+    this.usersService.listTeachersAll().subscribe({
       next: (users) => {
-        this.teachers = users.filter(u => u.role === 'TEACHER' && u.isActive);
+        this.teachers = users;
       },
       error: () => {
         // Error handled by interceptor
         this.teachers = [];
+      }
+    });
+  }
+
+  /**
+   * Load list of class levels for dropdown
+   */
+  loadClassLevels(): void {
+    this.subjectsService.getClassLevels().subscribe({
+      next: (levels) => {
+        this.classLevels = levels;
+      },
+      error: () => {
+        // Error handled by interceptor
+        this.classLevels = [];
       }
     });
   }

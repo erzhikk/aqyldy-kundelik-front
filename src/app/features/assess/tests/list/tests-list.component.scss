@@ -131,6 +131,18 @@
       flex-direction: column;
       gap: 4px;
 
+      .test-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #0d9488;
+          text-decoration: underline;
+        }
+      }
+
       .test-description {
         font-size: 12px;
         color: #666;

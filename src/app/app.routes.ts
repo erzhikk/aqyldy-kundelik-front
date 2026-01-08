@@ -66,6 +66,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/assess/tests/form/test-form.component').then(m => m.TestFormComponent)
       },
       {
+        path: 'assess/tests/:id/card',
+        loadComponent: () => import('./features/assess/tests/card/test-card.component').then(m => m.TestCardComponent)
+      },
+      {
         path: 'assess/tests/:id/edit',
         loadComponent: () => import('./features/assess/tests/form/test-form.component').then(m => m.TestFormComponent)
       },

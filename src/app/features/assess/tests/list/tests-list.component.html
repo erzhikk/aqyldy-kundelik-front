@@ -78,7 +78,9 @@
         <th mat-header-cell *matHeaderCellDef>Title</th>
         <td mat-cell *matCellDef="let test">
           <div class="test-title">
-            {{ test.title }}
+            <a [routerLink]="['/app/assess/tests', test.id, 'card']" class="test-link">
+              {{ test.name || test.title }}
+            </a>
             @if (test.description) {
               <span class="test-description">{{ test.description }}</span>
             }
@@ -90,7 +92,7 @@
       <ng-container matColumnDef="subject">
         <th mat-header-cell *matHeaderCellDef>Subject</th>
         <td mat-cell *matCellDef="let test">
-          {{ getSubjectName(test.subjectId) }}
+          {{ test.subjectNameRu || test.subjectNameEn || getSubjectName(test.subjectId) }}
         </td>
       </ng-container>
 
@@ -98,7 +100,7 @@
       <ng-container matColumnDef="grade">
         <th mat-header-cell *matHeaderCellDef>Grade</th>
         <td mat-cell *matCellDef="let test">
-          Grade {{ test.grade }}
+          Grade {{ test.classLevel ?? test.grade }}
         </td>
       </ng-container>
 
@@ -107,11 +109,11 @@
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let test">
           <mat-chip-set>
-            <mat-chip
-              [highlighted]="test.published"
-              [color]="test.published ? 'primary' : 'accent'"
+          <mat-chip
+              [highlighted]="isTestPublished(test)"
+              [color]="isTestPublished(test) ? 'primary' : 'accent'"
             >
-              {{ test.published ? 'Published' : 'Draft' }}
+              {{ isTestPublished(test) ? 'Published' : 'Draft' }}
             </mat-chip>
           </mat-chip-set>
         </td>
@@ -146,7 +148,7 @@
               </button>
 
               <!-- Publish button (only for drafts) -->
-              @if (!test.published) {
+              @if (!isTestPublished(test)) {
                 <button
                   mat-icon-button
                   color="accent"

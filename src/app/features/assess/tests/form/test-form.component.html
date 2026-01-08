@@ -101,52 +101,44 @@
           <mat-form-field appearance="outline">
             <mat-label>
               <span class="step-number">1.</span>
-              {{ 'TEST_FORM.FIELD_CLASS_LEVEL_LABEL' | translate }}
+              {{ 'TEST_FORM.FIELD_SUBJECT_LABEL' | translate }}
             </mat-label>
-            <mat-select formControlName="classLevelId" required>
-              @if (classLevels && classLevels.length > 0) {
-                @for (classLevel of classLevels; track classLevel.id) {
-                  <mat-option [value]="classLevel.id">
-                    {{ classLevel.nameRu }}
+            <mat-select formControlName="subjectId" required>
+              @if (subjects && subjects.length > 0) {
+                @for (subject of subjects; track subject.id) {
+                  <mat-option [value]="subject.id">
+                    {{ subject.nameRu }}
                   </mat-option>
                 }
               } @else {
-                <mat-option disabled>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_LOADING' | translate }}</mat-option>
+                <mat-option disabled>{{ 'TEST_FORM.FIELD_SUBJECT_LOADING' | translate }}</mat-option>
               }
             </mat-select>
-            <mat-hint>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_HINT' | translate }}</mat-hint>
-            @if (form.get('classLevelId')?.invalid && form.get('classLevelId')?.touched) {
-              <mat-error>{{ 'TEST_FORM.FIELD_CLASS_LEVEL_REQUIRED' | translate }}</mat-error>
+            <mat-hint>{{ 'TEST_FORM.FIELD_SUBJECT_HINT_NEW' | translate }}</mat-hint>
+            @if (form.get('subjectId')?.invalid && form.get('subjectId')?.touched) {
+              <mat-error>{{ 'TEST_FORM.FIELD_SUBJECT_REQUIRED' | translate }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>
               <span class="step-number">2.</span>
-              {{ 'TEST_FORM.FIELD_SUBJECT_LABEL' | translate }}
+              {{ 'TEST_FORM.FIELD_SCHOOL_CLASSES_LABEL' | translate }}
             </mat-label>
-            <mat-select formControlName="subjectId" required [disabled]="!form.get('classLevelId')?.value">
-              @if (subjects && subjects.length > 0) {
-                @for (subject of subjects; track subject.id) {
-                  <mat-option [value]="subject.id">
-                    {{ subject.nameEn }}
+            <mat-select formControlName="schoolClassIds" required multiple>
+              @if (schoolClasses && schoolClasses.length > 0) {
+                @for (schoolClass of schoolClasses; track schoolClass.id) {
+                  <mat-option [value]="schoolClass.id">
+                    {{ schoolClass.code }}
                   </mat-option>
                 }
-              } @else if (form.get('classLevelId')?.value) {
-                <mat-option disabled>{{ 'TEST_FORM.FIELD_SUBJECT_EMPTY' | translate }}</mat-option>
               } @else {
-                <mat-option disabled>{{ 'TEST_FORM.FIELD_SUBJECT_SELECT_CLASS' | translate }}</mat-option>
+                <mat-option disabled>{{ 'TEST_FORM.FIELD_SCHOOL_CLASSES_LOADING' | translate }}</mat-option>
               }
             </mat-select>
-            @if (form.get('classLevelId')?.value && subjects) {
-              <mat-hint>{{ 'TEST_FORM.FIELD_SUBJECT_HINT' | translate:{ count: subjects.length } }}</mat-hint>
-            } @else {
-              <mat-hint class="warning-hint">
-                {{ 'TEST_FORM.FIELD_SUBJECT_WARNING' | translate }}
-              </mat-hint>
-            }
-            @if (form.get('subjectId')?.invalid && form.get('subjectId')?.touched) {
-              <mat-error>{{ 'TEST_FORM.FIELD_SUBJECT_REQUIRED' | translate }}</mat-error>
+            <mat-hint>{{ 'TEST_FORM.FIELD_SCHOOL_CLASSES_HINT' | translate }}</mat-hint>
+            @if (form.get('schoolClassIds')?.invalid && form.get('schoolClassIds')?.touched) {
+              <mat-error>{{ 'TEST_FORM.FIELD_SCHOOL_CLASSES_REQUIRED' | translate }}</mat-error>
             }
           </mat-form-field>
         </div>
@@ -257,7 +249,7 @@
       <mat-card-content>
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'TEST_FORM.FIELD_OPENS_LABEL' | translate }}</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_OPENS_DATE_LABEL' | translate }}</mat-label>
             <input
               matInput
               [matDatepicker]="opensAtPicker"
@@ -266,11 +258,23 @@
             >
             <mat-datepicker-toggle matIconSuffix [for]="opensAtPicker"></mat-datepicker-toggle>
             <mat-datepicker #opensAtPicker></mat-datepicker>
-            <mat-hint>{{ 'TEST_FORM.FIELD_OPENS_HINT' | translate }}</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_OPENS_DATE_HINT' | translate }}</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'TEST_FORM.FIELD_CLOSES_LABEL' | translate }}</mat-label>
+            <mat-label>{{ 'TEST_FORM.FIELD_OPENS_TIME_LABEL' | translate }}</mat-label>
+            <input
+              matInput
+              type="time"
+              formControlName="opensTime"
+              [placeholder]="'TEST_FORM.FIELD_OPENS_TIME_PLACEHOLDER' | translate"
+            >
+            <mat-icon matIconPrefix>schedule</mat-icon>
+            <mat-hint>{{ 'TEST_FORM.FIELD_OPENS_TIME_HINT' | translate }}</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'TEST_FORM.FIELD_CLOSES_DATE_LABEL' | translate }}</mat-label>
             <input
               matInput
               [matDatepicker]="closesAtPicker"
@@ -279,8 +283,27 @@
             >
             <mat-datepicker-toggle matIconSuffix [for]="closesAtPicker"></mat-datepicker-toggle>
             <mat-datepicker #closesAtPicker></mat-datepicker>
-            <mat-hint>{{ 'TEST_FORM.FIELD_CLOSES_HINT' | translate }}</mat-hint>
+            <mat-hint>{{ 'TEST_FORM.FIELD_CLOSES_DATE_HINT' | translate }}</mat-hint>
           </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'TEST_FORM.FIELD_CLOSES_TIME_LABEL' | translate }}</mat-label>
+            <input
+              matInput
+              type="time"
+              formControlName="closesTime"
+              [placeholder]="'TEST_FORM.FIELD_CLOSES_TIME_PLACEHOLDER' | translate"
+            >
+            <mat-icon matIconPrefix>schedule</mat-icon>
+            <mat-hint>{{ 'TEST_FORM.FIELD_CLOSES_TIME_HINT' | translate }}</mat-hint>
+          </mat-form-field>
+
+          @if (form.hasError('scheduleInvalid')) {
+            <div class="schedule-error full-width">
+              <mat-icon>error</mat-icon>
+              <span>{{ 'TEST_FORM.SCHEDULE_ERROR' | translate }}</span>
+            </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>

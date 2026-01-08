@@ -310,7 +310,10 @@ export class TestCompositionComponent implements OnInit {
    * Check if test is published
    */
   isPublished(): boolean {
-    return this._test()?.published || false;
+    const test = this._test();
+    if (!test) return false;
+    if (typeof test.published === 'boolean') return test.published;
+    return test.status === 'PUBLISHED';
   }
 
   /**

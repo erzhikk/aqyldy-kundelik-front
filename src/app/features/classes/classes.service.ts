@@ -10,7 +10,10 @@ export interface ClassDto {
   id: string;
   code: string;
   classTeacherId?: string | null;
+  classTeacherFullName?: string | null;
   langType: string;
+  classLevel?: number;
+  classLevelId?: string;
 }
 
 /**
@@ -20,6 +23,7 @@ export interface CreateClassBody {
   code: string;
   classTeacherId?: string | null;
   langType: string;
+  classLevel: number;
 }
 
 /**
@@ -29,6 +33,7 @@ export interface UpdateClassBody {
   code?: string;
   classTeacherId?: string | null;
   langType?: string;
+  classLevelId?: string;
 }
 
 /**

@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { ClassesService, CreateClassBody } from '../classes.service';
 import { UsersService, UserDto } from '../../users/users.service';
+import { SubjectsService, ClassLevelDto } from '../../subjects/subjects.service';
 
 const LANG_OPTIONS = ['kaz', 'rus', 'eng'];
 
@@ -31,33 +32,52 @@ export class ClassCreateComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<ClassCreateComponent>);
   private api = inject(ClassesService);
   private usersService = inject(UsersService);
+  private subjectsService = inject(SubjectsService);
 
   langOptions = LANG_OPTIONS;
   teachers: UserDto[] = [];
+  classLevels: ClassLevelDto[] = [];
   loading = false;
 
   // Form with validation
   form = this.fb.group({
     code: ['', [Validators.required, Validators.maxLength(3)]],
+    classLevel: [null as number | null, [Validators.required]],
     langType: ['kaz', [Validators.required]],
     classTeacherId: ['']
   });
 
   ngOnInit(): void {
     this.loadTeachers();
+    this.loadClassLevels();
   }
 
   /**
    * Load list of teachers (users with TEACHER role)
    */
   loadTeachers(): void {
-    this.usersService.list().subscribe({
+    this.usersService.listTeachersAll().subscribe({
       next: (users) => {
-        this.teachers = users.filter(u => u.role === 'TEACHER' && u.isActive);
+        this.teachers = users;
       },
       error: () => {
         // Error handled by interceptor
         this.teachers = [];
+      }
+    });
+  }
+
+  /**
+   * Load list of class levels for dropdown
+   */
+  loadClassLevels(): void {
+    this.subjectsService.getClassLevels().subscribe({
+      next: (levels) => {
+        this.classLevels = levels;
+      },
+      error: () => {
+        // Error handled by interceptor
+        this.classLevels = [];
       }
     });
   }

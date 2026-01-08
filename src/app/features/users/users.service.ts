@@ -177,6 +177,14 @@ export class UsersService {
   }
 
   /**
+   * Get list of teachers for dropdowns (without pagination)
+   * @returns Observable of UserDto array
+   */
+  listTeachersAll(): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.base}/teachers/all`);
+  }
+
+  /**
    * Get paginated list of staff (non-student users)
    * @param page Page number (0-indexed)
    * @param size Page size

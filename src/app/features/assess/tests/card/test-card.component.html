@@ -1,0 +1,198 @@
+<div class="test-card-container">
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-container">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+      <button mat-raised-button class="aqyldy-btn-mint" (click)="goBack()">
+        {{ 'COMMON.CLOSE' | translate }}
+      </button>
+    </div>
+  } @else if (test()) {
+    <!-- Header with back button -->
+    <div class="card-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>{{ 'TEST.TITLE_SINGULAR' | translate }} - {{ test()!.name || test()!.title }}</h2>
+    </div>
+
+    <!-- Test Information -->
+    <mat-card class="test-info-card">
+      <mat-card-content>
+        <div class="info-header">
+          <div class="title-section">
+            <h3>{{ test()!.name || test()!.title }}</h3>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="isPublished(test()!)"
+                [color]="isPublished(test()!) ? 'primary' : 'accent'">
+                {{ isPublished(test()!) ? ('TEST.STATUS_PUBLISHED' | translate) : ('TEST.STATUS_DRAFT' | translate) }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div class="action-buttons">
+            <button mat-raised-button color="primary" (click)="editTest()">
+              <mat-icon>edit</mat-icon>
+              {{ 'COMMON.EDIT' | translate }}
+            </button>
+            <button mat-raised-button class="aqyldy-btn-mint" (click)="manageQuestions()">
+              <mat-icon>list</mat-icon>
+              {{ 'TEST.MANAGE_QUESTIONS' | translate }}
+            </button>
+          </div>
+        </div>
+
+        @if (test()!.description) {
+          <p class="description">{{ test()!.description }}</p>
+        }
+
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon>subject</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.SUBJECT' | translate }}</span>
+              <span class="info-value">{{ test()!.subjectNameRu || test()!.subjectNameEn || test()!.subject?.nameRu || 'N/A' }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>school</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.GRADE' | translate }}</span>
+              <span class="info-value">{{ 'TEST.GRADE_VALUE' | translate: {grade: (test()!.classLevel ?? test()!.grade)} }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>timer</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.DURATION' | translate }}</span>
+              <span class="info-value">{{ formatDuration(test()!.durationSec || 0) }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>repeat</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.ALLOWED_ATTEMPTS' | translate }}</span>
+              <span class="info-value">{{ test()!.allowedAttempts }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>grade</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.PASSING_PERCENT' | translate }}</span>
+              <span class="info-value">{{ test()!.passingPercent }}%</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <mat-icon>visibility</mat-icon>
+            <div class="info-content">
+              <span class="info-label">{{ 'TEST.REVIEW_POLICY' | translate }}</span>
+              <span class="info-value">{{ 'TEST.REVIEW_' + test()!.reviewPolicy | translate }}</span>
+            </div>
+          </div>
+
+          @if (test()!.opensAt) {
+            <div class="info-item">
+              <mat-icon>event</mat-icon>
+              <div class="info-content">
+                <span class="info-label">{{ 'TEST.OPENS_AT' | translate }}</span>
+                <span class="info-value">{{ formatDate(test()!.opensAt) }}</span>
+              </div>
+            </div>
+          }
+
+          @if (test()!.closesAt) {
+            <div class="info-item">
+              <mat-icon>event_busy</mat-icon>
+              <div class="info-content">
+                <span class="info-label">{{ 'TEST.CLOSES_AT' | translate }}</span>
+                <span class="info-value">{{ formatDate(test()!.closesAt) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="options-section">
+          <h4>{{ 'TEST.OPTIONS' | translate }}</h4>
+          <div class="options-list">
+            <div class="option-item">
+              <mat-icon [color]="test()!.shuffleQuestions ? 'primary' : ''">
+                {{ test()!.shuffleQuestions ? 'check_circle' : 'cancel' }}
+              </mat-icon>
+              <span>{{ 'TEST.SHUFFLE_QUESTIONS' | translate }}</span>
+            </div>
+            <div class="option-item">
+              <mat-icon [color]="test()!.shuffleChoices ? 'primary' : ''">
+                {{ test()!.shuffleChoices ? 'check_circle' : 'cancel' }}
+              </mat-icon>
+              <span>{{ 'TEST.SHUFFLE_CHOICES' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Questions List -->
+    <mat-card class="questions-card">
+      <mat-card-content>
+        <div class="questions-header">
+          <h3>{{ 'TEST.QUESTIONS_TITLE' | translate }} ({{ questions().length }})</h3>
+          <button mat-raised-button class="aqyldy-btn-mint" (click)="manageQuestions()">
+            <mat-icon>add</mat-icon>
+            {{ 'TEST.MANAGE_QUESTIONS' | translate }}
+          </button>
+        </div>
+
+        @if (questions().length === 0) {
+          <div class="empty-state">{{ 'TEST.NO_QUESTIONS' | translate }}</div>
+        } @else {
+          <table mat-table [dataSource]="questions()" class="questions-table">
+            <ng-container matColumnDef="order">
+              <th mat-header-cell *matHeaderCellDef>{{ 'TEST.ORDER' | translate }}</th>
+              <td mat-cell *matCellDef="let question">{{ question.order }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="question">
+              <th mat-header-cell *matHeaderCellDef>{{ 'TOPIC.DETAILS.QUESTION' | translate }}</th>
+              <td mat-cell *matCellDef="let question">
+                <a class="question-link" (click)="viewQuestion(question)" [matTooltip]="'TOPIC.DETAILS.VIEW_ANSWERS' | translate">
+                  {{ question.questionText }}
+                </a>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="weight">
+              <th mat-header-cell *matHeaderCellDef>{{ 'TEST.WEIGHT' | translate }}</th>
+              <td mat-cell *matCellDef="let question">{{ question.weight }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.ACTIONS' | translate }}</th>
+              <td mat-cell *matCellDef="let question">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  (click)="viewQuestion(question)"
+                  [matTooltip]="'TOPIC.DETAILS.VIEW_ANSWERS' | translate">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="question-row"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

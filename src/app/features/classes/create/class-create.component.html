@@ -11,6 +11,18 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
+        <mat-label>Class Level</mat-label>
+        <mat-select formControlName="classLevel" required>
+          @for (level of classLevels; track level.id) {
+            <mat-option [value]="level.level">{{ level.level }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('classLevel')?.invalid && form.get('classLevel')?.touched) {
+          <mat-error>Class level is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
         <mat-label>Language Type</mat-label>
         <mat-select formControlName="langType" required>
           @for (lang of langOptions; track lang) {

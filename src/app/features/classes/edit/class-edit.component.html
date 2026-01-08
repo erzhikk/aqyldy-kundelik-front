@@ -1,13 +1,5 @@
 <h2 mat-dialog-title>Edit Class</h2>
 <mat-dialog-content>
-  <!-- Read-only fields -->
-  <div class="read-only-section">
-    <div class="read-only-field">
-      <span class="label">ID:</span>
-      <span class="value">{{ data.id }}</span>
-    </div>
-  </div>
-
   <!-- Editable fields -->
   <form [formGroup]="form" (ngSubmit)="submit()">
     <div class="form-grid">
@@ -16,6 +8,18 @@
         <input matInput formControlName="code" required maxlength="3">
         @if (form.get('code')?.invalid && form.get('code')?.touched) {
           <mat-error>Class code is required (max 3 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Class Level</mat-label>
+        <mat-select formControlName="classLevelId" required>
+          @for (level of classLevels; track level.id) {
+            <mat-option [value]="level.id">{{ level.level }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('classLevelId')?.invalid && form.get('classLevelId')?.touched) {
+          <mat-error>Class level is required</mat-error>
         }
       </mat-form-field>
 
