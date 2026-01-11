@@ -48,7 +48,7 @@
     </button>
 
     <button
-      *ngIf="file()"
+      *ngIf="file() && uploadMode === 'direct'"
       mat-raised-button
       color="accent"
       (click)="upload()"

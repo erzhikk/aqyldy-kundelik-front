@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PagedResponse } from '../../core/models/pagination';
+import { UserDto } from '../users/users.service';
 
 /**
  * Class DTO returned from API
@@ -11,9 +12,23 @@ export interface ClassDto {
   code: string;
   classTeacherId?: string | null;
   classTeacherFullName?: string | null;
+  teacher?: {
+    id: string;
+    fullName: string;
+  };
+  classTeacher?: {
+    id: string;
+    fullName: string;
+  };
+  classInfo?: {
+    code: string;
+    langType: string;
+    classLevel?: number;
+  };
   langType: string;
   classLevel?: number;
   classLevelId?: string;
+  students?: UserDto[];
 }
 
 /**
@@ -87,6 +102,15 @@ export class ClassesService {
    */
   getOne(id: string): Observable<ClassDto> {
     return this.http.get<ClassDto>(`${this.base}/${id}`);
+  }
+
+  /**
+   * Get students for a class
+   * @param classId Class UUID
+   * @returns Observable of UserDto array
+   */
+  getStudents(classId: string): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.base}/${classId}/students`);
   }
 
   /**

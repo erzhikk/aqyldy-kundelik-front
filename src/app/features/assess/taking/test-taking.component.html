@@ -99,6 +99,7 @@
             mat-raised-button
             *ngIf="isLastQuestion()"
             color="accent"
+            class="submit-primary"
             (click)="submitAttempt()"
             [disabled]="submitting()"
           >
@@ -112,6 +113,7 @@
           <button
             mat-raised-button
             color="warn"
+            class="submit-early"
             (click)="submitAttempt()"
             [disabled]="submitting()"
           >

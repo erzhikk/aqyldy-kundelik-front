@@ -1,0 +1,110 @@
+<div class="student-tests-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">quiz</mat-icon>
+      <div>
+        <h1>{{ 'TESTING.TITLE' | translate }}</h1>
+        <p class="subtitle">{{ 'TESTING.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>{{ 'COMMON.LOADING' | translate }}</p>
+    </div>
+  }
+
+  <!-- Tests Grid -->
+  @else if (tests().length > 0) {
+    <div class="tests-grid">
+      @for (test of tests(); track test.id) {
+        <mat-card class="test-card" [class.unavailable]="!isTestAvailable(test)">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>assignment</mat-icon>
+              {{ test.name || test.title }}
+            </mat-card-title>
+            <mat-chip-set>
+              <mat-chip
+                [color]="isTestAvailable(test) ? 'primary' : 'warn'"
+                highlighted>
+                {{ getTestStatus(test) }}
+              </mat-chip>
+            </mat-chip-set>
+          </mat-card-header>
+
+          <mat-card-content>
+            @if (test.description) {
+              <p class="description">{{ test.description }}</p>
+            }
+
+            <div class="test-info">
+              <div class="info-row">
+                <mat-icon>subject</mat-icon>
+                <span>{{ test.subjectNameRu || test.subjectNameEn }}</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon>quiz</mat-icon>
+                <span>{{ test.topics?.length || 0 }} топиков</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon>timer</mat-icon>
+                <span>{{ formatDuration(test.durationSec || 0) }}</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon>repeat</mat-icon>
+                <span>{{ test.allowedAttempts }} попыток</span>
+              </div>
+
+              <div class="info-row">
+                <mat-icon>grade</mat-icon>
+                <span>Проходной балл: {{ test.passingPercent }}%</span>
+              </div>
+
+              @if (test.opensAt) {
+                <div class="info-row">
+                  <mat-icon>event</mat-icon>
+                  <span>Открывается: {{ formatDate(test.opensAt) }}</span>
+                </div>
+              }
+
+              @if (test.closesAt) {
+                <div class="info-row">
+                  <mat-icon>event_busy</mat-icon>
+                  <span>Закрывается: {{ formatDate(test.closesAt) }}</span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button
+              mat-raised-button
+              class="aqyldy-btn-mint"
+              [disabled]="!isTestAvailable(test)"
+              (click)="startTest(test)">
+              <mat-icon>play_arrow</mat-icon>
+              {{ 'TESTING.START_TEST' | translate }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else {
+    <div class="empty-state">
+      <mat-icon>assignment_turned_in</mat-icon>
+      <h2>{{ 'TESTING.NO_TESTS' | translate }}</h2>
+      <p>{{ 'TESTING.NO_TESTS_DESCRIPTION' | translate }}</p>
+    </div>
+  }
+</div>

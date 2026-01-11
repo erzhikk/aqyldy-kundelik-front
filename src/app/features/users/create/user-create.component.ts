@@ -60,10 +60,10 @@ export class UserCreateComponent implements OnInit {
     role: ['TEACHER', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     dateOfBirth: [''],
-    photoKey: [''],  // S3 key for avatar photo (for display)
-    photoMediaId: [''],  // UUID of MediaObject for avatar photo (for create)
     classId: ['']
   });
+
+  avatarFile: File | null = null;
 
   ngOnInit(): void {
     // Load classes for student selection
@@ -90,29 +90,16 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-  /**
-   * Check if current role is STUDENT
-   */
+  onAvatarSelected(file: File): void {
+    this.avatarFile = file;
+  }
+
+  onAvatarCleared(): void {
+    this.avatarFile = null;
+  }
+
   isStudent(): boolean {
     return this.form.get('role')?.value === 'STUDENT';
-  }
-
-  /**
-   * Handle successful avatar upload
-   */
-  onAvatarUploaded(result: { s3Key: string; mediaObjectId: string }): void {
-    this.form.patchValue({
-      photoKey: result.s3Key,
-      photoMediaId: result.mediaObjectId
-    });
-    this.snackBar.open('Аватар успешно загружен', 'OK', { duration: 3000 });
-  }
-
-  /**
-   * Handle avatar upload error
-   */
-  onAvatarError(error: string): void {
-    this.snackBar.open(`Ошибка загрузки: ${error}`, 'OK', { duration: 5000 });
   }
 
   /**
@@ -120,6 +107,10 @@ export class UserCreateComponent implements OnInit {
    */
   submit(): void {
     if (this.form.invalid) return;
+    if (!this.avatarFile) {
+      this.snackBar.open('Select an avatar image before creating the user', 'OK', { duration: 4000 });
+      return;
+    }
 
     this.loading = true;
     const formValue = this.form.value;
@@ -135,24 +126,20 @@ export class UserCreateComponent implements OnInit {
       body.dateOfBirth = formValue.dateOfBirth;
     }
 
-    // Include photoMediaId if it's set (new uploads)
-    if (formValue.photoMediaId) {
-      body.photoMediaId = formValue.photoMediaId;
-    }
-
     // Only include classId if it's set (for students)
     if (formValue.classId) {
       body.classId = formValue.classId;
     }
 
-    this.api.create(body).subscribe({
+    this.api.create(body, this.avatarFile).subscribe({
       next: (user) => {
         this.loading = false;
         this.dialogRef.close(user); // Return created user to caller
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
-        // Error notification shown automatically by error interceptor
+        const message = error?.error?.message || 'Failed to create user';
+        this.snackBar.open(message, 'OK', { duration: 5000 });
       }
     });
   }

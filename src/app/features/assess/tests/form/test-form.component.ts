@@ -341,6 +341,13 @@ export class TestFormComponent implements OnInit {
   publish(): void {
     if (!this.testId || this.loading || this.isPublished()) return;
 
+    // Check if composition plan is fulfilled
+    if (!this.isCompositionPlanFulfilled()) {
+      const message = this.getPlanFulfillmentMessage();
+      this.notify.warning(message || 'План структуры теста не выполнен');
+      return;
+    }
+
     if (!confirm(this.translate.instant('TEST_FORM.CONFIRM_PUBLISH'))) {
       return;
     }
@@ -357,6 +364,58 @@ export class TestFormComponent implements OnInit {
         // Error handled by interceptor
       }
     });
+  }
+
+  /**
+   * Check if test composition plan is fulfilled
+   */
+  isCompositionPlanFulfilled(): boolean {
+    if (!this.testId) return true;
+
+    const key = `testPlan_${this.testId}`;
+    const stored = sessionStorage.getItem(key);
+
+    if (!stored) {
+      return true;
+    }
+
+    try {
+      const plan = JSON.parse(stored);
+
+      return plan.topicPlans.every((tp: any) => {
+        return tp.selectedQuestionIds.length >= tp.targetCount;
+      });
+    } catch (e) {
+      console.error('Failed to parse test plan:', e);
+      return true;
+    }
+  }
+
+  /**
+   * Get plan fulfillment message
+   */
+  getPlanFulfillmentMessage(): string {
+    if (!this.testId) return '';
+
+    const key = `testPlan_${this.testId}`;
+    const stored = sessionStorage.getItem(key);
+
+    if (!stored) return '';
+
+    try {
+      const plan = JSON.parse(stored);
+      const unfulfilled = plan.topicPlans.filter((tp: any) =>
+        tp.selectedQuestionIds.length < tp.targetCount
+      );
+
+      if (unfulfilled.length > 0) {
+        return `План не выполнен: не хватает вопросов по топикам: ${unfulfilled.map((tp: any) => tp.topicName).join(', ')}`;
+      }
+
+      return '';
+    } catch (e) {
+      return '';
+    }
   }
 
   /**

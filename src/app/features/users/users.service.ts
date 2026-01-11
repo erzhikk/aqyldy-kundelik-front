@@ -235,8 +235,13 @@ export class UsersService {
    * @param body User creation data
    * @returns Observable of created UserDto
    */
-  create(body: CreateUserBody): Observable<UserDto> {
-    return this.http.post<UserDto>(this.base, body);
+  create(body: CreateUserBody, avatarFile?: File | null): Observable<UserDto> {
+    const formData = new FormData();
+    formData.append('user', new Blob([JSON.stringify(body)], { type: 'application/json' }));
+    if (avatarFile) {
+      formData.append('file', avatarFile);
+    }
+    return this.http.post<UserDto>(this.base, formData);
   }
 
   /**

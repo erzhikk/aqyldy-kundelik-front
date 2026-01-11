@@ -72,8 +72,24 @@ export class TestCardComponent implements OnInit {
     this.testsApi.getOne(this.testId).subscribe({
       next: (test) => {
         this._test.set(test);
-        // API возвращает вопросы в поле questions
-        this._questions.set(test.questions || []);
+
+        // Parse topics structure to flat array of questions
+        const topics = test.topics || [];
+        const allQuestions: any[] = [];
+        let orderCounter = 0;
+
+        topics.forEach(topic => {
+          topic.questions.forEach(q => {
+            allQuestions.push({
+              ...q,
+              topicId: topic.topicId,
+              questionText: q.text, // Map text to questionText for compatibility
+              order: orderCounter++
+            });
+          });
+        });
+
+        this._questions.set(allQuestions);
         this._loading.set(false);
       },
       error: () => {
@@ -84,16 +100,38 @@ export class TestCardComponent implements OnInit {
   }
 
   viewQuestion(testQuestion: TestQuestionDto): void {
-    // Fetch full question details
-    this.questionsApi.getOne(testQuestion.questionId).subscribe({
-      next: (question) => {
-        this.dialog.open(QuestionViewDialogComponent, {
-          width: '600px',
-          maxWidth: '95vw',
-          data: { question }
-        });
-      }
-    });
+    // Check if question data is already included in the response
+    if (testQuestion.choices && testQuestion.choices.length > 0) {
+      // Use existing data - no need for additional API call
+      const question: QuestionDto = {
+        id: testQuestion.questionId,
+        text: testQuestion.text || testQuestion.questionText || '',
+        topicId: testQuestion.topicId || '',
+        difficulty: (testQuestion.difficulty as any) || 'MEDIUM',
+        choices: testQuestion.choices,
+        explanation: testQuestion.explanation || null,
+        mediaId: null,
+        createdAt: '',
+        updatedAt: ''
+      };
+
+      this.dialog.open(QuestionViewDialogComponent, {
+        width: '600px',
+        maxWidth: '95vw',
+        data: { question }
+      });
+    } else {
+      // Fallback: Fetch full question details if not included
+      this.questionsApi.getOne(testQuestion.questionId).subscribe({
+        next: (question) => {
+          this.dialog.open(QuestionViewDialogComponent, {
+            width: '600px',
+            maxWidth: '95vw',
+            data: { question }
+          });
+        }
+      });
+    }
   }
 
   goBack(): void {

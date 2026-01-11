@@ -5,10 +5,10 @@
     <div class="avatar-section">
       <app-upload-avatar
         [userId]="temporaryUserId"
-        [currentAvatarKey]="form.get('photoKey')?.value || undefined"
         [size]="'medium'"
-        (uploadSuccess)="onAvatarUploaded($event)"
-        (uploadError)="onAvatarError($event)"
+        [uploadMode]="'manual'"
+        (fileSelected)="onAvatarSelected($event)"
+        (fileCleared)="onAvatarCleared()"
       ></app-upload-avatar>
     </div>
 

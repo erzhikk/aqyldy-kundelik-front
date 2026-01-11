@@ -33,6 +33,104 @@
     </mat-card>
   }
 
+  <!-- Planning Section -->
+  @if (!isPublished()) {
+    <mat-card class="planning-section">
+      <mat-card-header>
+        <mat-card-title>План теста</mat-card-title>
+        <div class="plan-progress">
+          Выбрано {{ getPlanProgress().totalSelected }} из {{ getPlanProgress().totalTarget }} вопросов
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (testPlan() && testPlan()!.topicPlans.length > 0) {
+          <!-- Plan Table -->
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th>Топик</th>
+                <th>Требуется</th>
+                <th>Доступно</th>
+                <th>Выбрано</th>
+                <th>Прогресс</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (topicPlan of testPlan()!.topicPlans; track topicPlan.topicId) {
+                <tr>
+                  <td>{{ topicPlan.topicName }}</td>
+                  <td>
+                    <mat-form-field appearance="outline" class="compact-field">
+                      <input
+                        matInput
+                        type="number"
+                        min="1"
+                        max="50"
+                        [value]="topicPlan.targetCount"
+                        (change)="updateTopicTargetCount(topicPlan.topicId, +$any($event.target).value)"
+                      >
+                    </mat-form-field>
+                  </td>
+                  <td>
+                    <span class="available-count">{{ getAvailableQuestionsCount(topicPlan.topicId) }}</span>
+                  </td>
+                  <td>{{ getTopicProgress(topicPlan.topicId).selected }}</td>
+                  <td>
+                    <div class="progress-bar-container">
+                      <mat-progress-bar
+                        mode="determinate"
+                        [value]="getTopicProgress(topicPlan.topicId).percentage"
+                        [color]="getTopicProgress(topicPlan.topicId).isFulfilled ? 'primary' : 'accent'"
+                      ></mat-progress-bar>
+                      <span class="progress-text">
+                        {{ getTopicProgress(topicPlan.topicId).percentage }}%
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeTopicFromPlan(topicPlan.topicId)"
+                      matTooltip="Удалить из плана"
+                    >
+                      <mat-icon>remove_circle</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <!-- Overall Progress -->
+          <div class="overall-progress" [class.not-fulfilled]="!getPlanProgress().isFulfilled">
+            <mat-icon [color]="getPlanProgress().isFulfilled ? 'primary' : ''">
+              {{ getPlanProgress().isFulfilled ? 'check_circle' : 'pending' }}
+            </mat-icon>
+            <span>
+              План {{ getPlanProgress().isFulfilled ? 'выполнен' : 'не выполнен' }}:
+              {{ getPlanProgress().totalSelected }}/{{ getPlanProgress().totalTarget }}
+            </span>
+          </div>
+        }
+
+        <!-- Plan Actions -->
+        <div class="plan-actions">
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="openAddTopicDialog()"
+          >
+            <mat-icon>add</mat-icon>
+            Добавить топик в план
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
   <!-- Two-panel layout -->
   <div class="panels-container">
     <!-- Left Panel: Question Bank -->
@@ -42,137 +140,154 @@
       </mat-card-header>
 
       <mat-card-content>
-        <!-- Filters -->
-        <div class="filters">
-          <mat-form-field appearance="outline">
-            <mat-label>Search</mat-label>
-            <input matInput [formControl]="searchControl" placeholder="Search questions...">
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Topic</mat-label>
-            <mat-select [formControl]="topicFilter">
-              <mat-option [value]="null">All Topics</mat-option>
-              @for (topic of topics(); track topic.id) {
-                <mat-option [value]="topic.id">{{ topic.name }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Difficulty</mat-label>
-            <mat-select [formControl]="difficultyFilter">
-              <mat-option [value]="null">All Levels</mat-option>
-              @for (diff of difficulties; track diff) {
-                <mat-option [value]="diff">{{ diff }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <!-- Question List -->
-        <mat-list class="question-list">
-          @for (question of availableQuestions(); track question.id) {
-            <mat-list-item>
-              <div class="question-item">
-                <div class="question-content">
-                  <span class="question-text">{{ question.text }}</span>
-                  <mat-chip-set>
-                    <mat-chip [color]="getDifficultyColor(question.difficulty)" highlighted>
-                      {{ question.difficulty }}
-                    </mat-chip>
-                  </mat-chip-set>
-                </div>
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="addQuestionToTest(question)"
-                  [disabled]="isPublished()"
-                  matTooltip="Add to test"
-                >
-                  <mat-icon>add_circle</mat-icon>
-                </button>
-              </div>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-          } @empty {
-            <div class="no-data">
-              <mat-icon>search_off</mat-icon>
-              <p>No questions found</p>
+        <!-- Question List grouped by topics -->
+        @if (groupedAvailableQuestions().length > 0) {
+          @for (group of groupedAvailableQuestions(); track group.topicId) {
+            <!-- Topic Header -->
+            <div class="topic-group-header question-bank-header" (click)="toggleQuestionBankTopicCollapse(group.topicId)">
+              <mat-icon>topic</mat-icon>
+              <span class="topic-name">{{ group.topicName }}</span>
+              <span class="topic-count">({{ group.questions.length }})</span>
+              <mat-icon class="collapse-icon">
+                {{ isQuestionBankTopicCollapsed(group.topicId) ? 'expand_more' : 'expand_less' }}
+              </mat-icon>
             </div>
+
+            <!-- Topic Questions List -->
+            @if (!isQuestionBankTopicCollapsed(group.topicId)) {
+              <mat-list class="question-list">
+              @for (question of group.questions; track question.id) {
+                <mat-list-item>
+                  <div class="question-item">
+                    <mat-checkbox
+                      [checked]="isQuestionSelected(question.id)"
+                      (change)="onQuestionCheckboxChange(question, $event.checked)"
+                      [disabled]="isPublished()"
+                      color="primary"
+                    ></mat-checkbox>
+                    <div class="question-content" (click)="viewQuestion(question)">
+                      <span class="question-text">{{ question.text }}</span>
+                      <mat-chip-set>
+                        <mat-chip [color]="getDifficultyColor(question.difficulty)" highlighted>
+                          {{ question.difficulty }}
+                        </mat-chip>
+                      </mat-chip-set>
+                    </div>
+                  </div>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              } @empty {
+                <div class="no-data-small">
+                  <small>Нет вопросов</small>
+                </div>
+              }
+              </mat-list>
+            }
           }
-        </mat-list>
+        } @else {
+          <div class="no-data">
+            <mat-icon>search_off</mat-icon>
+            <p>No questions found</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 
     <!-- Right Panel: Test Basket -->
     <mat-card class="panel test-basket">
       <mat-card-header>
-        <mat-card-title>Test Questions ({{ testQuestions().length }})</mat-card-title>
+        <mat-card-title>Вопросы теста ({{ testQuestions().length }})</mat-card-title>
         <div class="total-score">
-          Total Score: <strong>{{ getTotalScore() }}</strong>
+          Всего баллов: <strong>{{ getTotalScore() }}</strong>
         </div>
       </mat-card-header>
 
       <mat-card-content>
-        <!-- Sortable List -->
-        <mat-list
-          cdkDropList
-          (cdkDropListDropped)="onDrop($event)"
-          class="test-question-list"
-        >
-          @for (tq of testQuestions(); track tq.questionId) {
-            <mat-list-item cdkDrag [cdkDragDisabled]="isPublished()">
-              <div class="test-question-item">
-                <!-- Drag Handle -->
-                <mat-icon cdkDragHandle class="drag-handle" *ngIf="!isPublished()">
-                  drag_indicator
-                </mat-icon>
-
-                <!-- Order Badge -->
-                <div class="order-badge">{{ tq.order + 1 }}</div>
-
-                <!-- Question Text -->
-                <div class="question-content">
-                  <span class="question-text">{{ tq.questionText || 'Question ' + (tq.order + 1) }}</span>
-                </div>
-
-                <!-- Weight Input -->
-                <mat-form-field appearance="outline" class="weight-field">
-                  <mat-label>Weight</mat-label>
-                  <input
-                    matInput
-                    type="number"
-                    min="0"
-                    max="10"
-                    [value]="getWeight(tq.questionId)"
-                    (input)="updateWeight(tq.questionId, $any($event.target).value)"
-                    [disabled]="isPublished()"
-                  >
-                </mat-form-field>
-
-                <!-- Remove Button -->
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="removeQuestionFromTest(tq)"
-                  [disabled]="isPublished()"
-                  matTooltip="Remove from test"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-          } @empty {
-            <div class="no-data">
-              <mat-icon>assignment</mat-icon>
-              <p>No questions added yet</p>
-              <small>Add questions from the question bank on the left</small>
+        <!-- Grouped by topics -->
+        @if (groupedTestQuestions().length > 0) {
+          @for (group of groupedTestQuestions(); track group.topicId) {
+            <!-- Topic Header -->
+            <div class="topic-group-header" (click)="toggleTestTopicCollapse(group.topicId)">
+              <mat-icon>topic</mat-icon>
+              <span class="topic-name">{{ group.topicName }}</span>
+              <span class="topic-count">
+                ({{ group.questions.length }}
+                @if (getTopicTargetCount(group.topicId) > 0) {
+                  / {{ getTopicTargetCount(group.topicId) }}
+                })
+              </span>
+              <mat-chip
+                [color]="isTopicFulfilled(group.topicId) ? 'primary' : 'accent'"
+                highlighted
+                (click)="$event.stopPropagation()"
+              >
+                {{ isTopicFulfilled(group.topicId) ? 'Выполнено' : 'В процессе' }}
+              </mat-chip>
+              <mat-icon class="collapse-icon">
+                {{ isTestTopicCollapsed(group.topicId) ? 'expand_more' : 'expand_less' }}
+              </mat-icon>
             </div>
+
+            <!-- Topic Questions List -->
+            @if (!isTestTopicCollapsed(group.topicId)) {
+              <mat-list
+              cdkDropList
+              [id]="'topic-' + group.topicId"
+              (cdkDropListDropped)="onDropWithinTopic($event, group.topicId)"
+              class="topic-question-list"
+            >
+              @for (tq of group.questions; track tq.questionId) {
+                <mat-list-item cdkDrag [cdkDragDisabled]="isPublished()">
+                  <div class="test-question-item">
+                    <!-- Drag Handle -->
+                    <mat-icon cdkDragHandle class="drag-handle" *ngIf="!isPublished()">
+                      drag_indicator
+                    </mat-icon>
+
+                    <!-- Question Text with Number -->
+                    <div class="question-content" (click)="viewTestQuestion(tq)" style="cursor: pointer;">
+                      <span class="question-text">
+                        <strong class="question-number">{{ tq.order + 1 }}.</strong> {{ tq.questionText || 'Вопрос ' + (tq.order + 1) }}
+                      </span>
+                    </div>
+
+                    <!-- Weight Display (Auto-calculated) -->
+                    <mat-form-field appearance="outline" class="weight-field">
+                      <mat-label>Баллы</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        [value]="getWeight(tq.questionId)"
+                        readonly
+                        disabled
+                      >
+                      <mat-hint>Авто</mat-hint>
+                    </mat-form-field>
+
+                    <!-- Remove Button -->
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeQuestionFromTest(tq)"
+                      [disabled]="isPublished()"
+                      matTooltip="Удалить"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              }
+              </mat-list>
+            }
           }
-        </mat-list>
+        } @else {
+          <div class="no-data">
+            <mat-icon>assignment</mat-icon>
+            <p>Нет вопросов</p>
+            <small>Добавьте вопросы из банка слева или сгенерируйте автоматически</small>
+          </div>
+        }
       </mat-card-content>
 
       <!-- Save Button -->

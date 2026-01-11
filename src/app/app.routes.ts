@@ -38,6 +38,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/classes/list/classes-list.component').then(m => m.ClassesListComponent)
       },
       {
+        path: 'classes/:id/card',
+        loadComponent: () => import('./features/classes/card/class-card.component').then(m => m.ClassCardComponent)
+      },
+      {
         path: 'subjects',
         loadComponent: () => import('./features/subjects/list/subjects-list.component').then(m => m.SubjectsListComponent)
       },
@@ -48,6 +52,10 @@ export const routes: Routes = [
       {
         path: 'subjects/:subjectId/topics/:topicId',
         loadComponent: () => import('./features/assess/topics/details/topic-details.component').then(m => m.TopicDetailsComponent)
+      },
+      {
+        path: 'testing',
+        loadComponent: () => import('./features/assess/student-tests/student-tests-list.component').then(m => m.StudentTestsListComponent)
       },
       {
         path: 'timetable',

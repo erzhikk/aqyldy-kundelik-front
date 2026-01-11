@@ -21,9 +21,17 @@
     "STAFF": "Қызметкерлер",
     "CLASSES": "Сыныптар",
     "SUBJECTS": "Пәндер",
+    "TESTING": "Тестілеу",
     "TIMETABLE": "Сабақ кестесі",
     "ATTENDANCE": "Қатысу",
     "TESTS": "Тесттер"
+  },
+  "TESTING": {
+    "TITLE": "Тестілеу",
+    "SUBTITLE": "Өту үшін қолжетімді тесттер",
+    "START_TEST": "Тестті бастау",
+    "NO_TESTS": "Қолжетімді тесттер жоқ",
+    "NO_TESTS_DESCRIPTION": "Қазір өту үшін жарияланған тесттер жоқ"
   },
   "AUTH": {
     "LOGIN": "Кіру",
@@ -250,5 +258,33 @@
     "NOTIFY_DELETE_BLOCK": "Тапсыру әрекеттері бар тестті жоюға болмайды",
     "CONFIRM_PUBLISH": "Тестті жариялайсыз ба? Жарияланғаннан кейін тест құрамын өңдей алмайсыз.",
     "CONFIRM_DELETE": "Тестті жоясыз ба? Бұл әрекетті болдырмауға болмайды."
+  },
+  "TEST_COMPOSITION": {
+    "TITLE": "Тест құрылымы",
+    "SUBTITLE": "Тест сұрақтарын басқару",
+    "PLAN_SECTION_TITLE": "Тест жоспары",
+    "PLAN_SECTION_SUBTITLE": "Әр тақырып бойынша қанша сұрақ қажет екенін анықтаңыз",
+    "PLAN_PROGRESS": "{{target}} ішінен {{selected}} таңдалды",
+    "PLAN_FULFILLED": "Жоспар орындалды",
+    "PLAN_NOT_FULFILLED": "Жоспар орындалмады",
+    "TABLE_TOPIC": "Тақырып",
+    "TABLE_TARGET": "Сұрақтар саны",
+    "TABLE_SELECTED": "Таңдалды",
+    "TABLE_PROGRESS": "Үдеріс",
+    "TABLE_ACTIONS": "Әрекеттер",
+    "ACTION_ADD_TOPIC": "Жоспарға тақырып қосу",
+    "ACTION_GENERATE": "Сұрақтарды автоматты түрде жасау",
+    "ACTION_REMOVE_TOPIC": "Жоспардан жою",
+    "REMAINING_HINT": "\"{{topic}}\" тақырыбы бойынша қосу қалды: {{count}} сұрақ",
+    "NO_REMAINING": "Бұл тақырып үшін барлық сұрақтар қосылды",
+    "TOPIC_GROUP_FULFILLED": "Орындалды",
+    "TOPIC_GROUP_IN_PROGRESS": "Орындалуда",
+    "NOTIFY_TOPIC_ADDED": "Тақырып жоспарға қосылды",
+    "NOTIFY_TOPIC_REMOVED": "Тақырып жоспардан жойылды",
+    "NOTIFY_TOPIC_EXISTS": "Тақырып жоспарда бар",
+    "NOTIFY_QUESTIONS_GENERATED": "{{count}} сұрақ қосылды",
+    "NOTIFY_NO_QUESTIONS": "Қосуға қолжетімді сұрақтар жоқ",
+    "NOTIFY_GENERATION_ERROR": "Сұрақтарды жасау қатесі",
+    "NOTIFY_PLAN_NOT_FULFILLED": "Тест құрылымының жоспары орындалмады"
   }
 }

@@ -21,9 +21,17 @@
     "STAFF": "Сотрудники",
     "CLASSES": "Классы",
     "SUBJECTS": "Предметы",
+    "TESTING": "Тестирование",
     "TIMETABLE": "Расписание",
     "ATTENDANCE": "Посещаемость",
     "TESTS": "Тесты"
+  },
+  "TESTING": {
+    "TITLE": "Тестирование",
+    "SUBTITLE": "Доступные тесты для прохождения",
+    "START_TEST": "Начать тест",
+    "NO_TESTS": "Нет доступных тестов",
+    "NO_TESTS_DESCRIPTION": "В данный момент нет опубликованных тестов для прохождения"
   },
   "AUTH": {
     "LOGIN": "Войти",
@@ -248,7 +256,36 @@
     "NOTIFY_PUBLISH_SUCCESS": "Тест успешно опубликован",
     "NOTIFY_DELETE_SUCCESS": "Тест удален",
     "NOTIFY_DELETE_BLOCK": "Нельзя удалить тест с попытками",
-    "CONFIRM_PUBLISH": "Опубликовать тест? После публикации нельзя редактировать состав теста.",
+    "CONFIRM_PUBLISH": "Опубликовать тест? Это действие необратимо: изменить состав после публикации нельзя.",
+    "CONFIRM_PUBLISH_WITH_TITLE": "Опубликовать тест \"{{title}}\"? Это действие необратимо: изменить состав после публикации нельзя.",
     "CONFIRM_DELETE": "Удалить тест? Это действие нельзя отменить."
+  },
+  "TEST_COMPOSITION": {
+    "TITLE": "Структура теста",
+    "SUBTITLE": "Управление вопросами теста",
+    "PLAN_SECTION_TITLE": "План теста",
+    "PLAN_SECTION_SUBTITLE": "Определите сколько вопросов нужно по каждому топику",
+    "PLAN_PROGRESS": "Выбрано {{selected}} из {{target}} вопросов",
+    "PLAN_FULFILLED": "План выполнен",
+    "PLAN_NOT_FULFILLED": "План не выполнен",
+    "TABLE_TOPIC": "Топик",
+    "TABLE_TARGET": "Требуется вопросов",
+    "TABLE_SELECTED": "Выбрано",
+    "TABLE_PROGRESS": "Прогресс",
+    "TABLE_ACTIONS": "Действия",
+    "ACTION_ADD_TOPIC": "Добавить топик в план",
+    "ACTION_GENERATE": "Сгенерировать вопросы автоматически",
+    "ACTION_REMOVE_TOPIC": "Удалить из плана",
+    "REMAINING_HINT": "Осталось добавить: {{count}} вопросов по топику \"{{topic}}\"",
+    "NO_REMAINING": "Все вопросы добавлены для этого топика",
+    "TOPIC_GROUP_FULFILLED": "Выполнено",
+    "TOPIC_GROUP_IN_PROGRESS": "В процессе",
+    "NOTIFY_TOPIC_ADDED": "Топик добавлен в план",
+    "NOTIFY_TOPIC_REMOVED": "Топик удален из плана",
+    "NOTIFY_TOPIC_EXISTS": "Топик уже добавлен в план",
+    "NOTIFY_QUESTIONS_GENERATED": "Добавлено {{count}} вопросов",
+    "NOTIFY_NO_QUESTIONS": "Нет доступных вопросов для добавления",
+    "NOTIFY_GENERATION_ERROR": "Ошибка при генерации вопросов",
+    "NOTIFY_PLAN_NOT_FULFILLED": "План структуры теста не выполнен"
   }
 }

@@ -71,6 +71,11 @@ export class UploadAvatarComponent {
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
 
   /**
+   * Upload mode: direct upload or parent-managed
+   */
+  @Input() uploadMode: 'direct' | 'manual' = 'direct';
+
+  /**
    * Emits upload result when upload succeeds
    */
   @Output() uploadSuccess = new EventEmitter<{ s3Key: string; mediaObjectId: string }>();
@@ -79,6 +84,16 @@ export class UploadAvatarComponent {
    * Emits error message when upload fails
    */
   @Output() uploadError = new EventEmitter<string>();
+
+  /**
+   * Emits selected file when upload is managed by parent
+   */
+  @Output() fileSelected = new EventEmitter<File>();
+
+  /**
+   * Emits when selected file is cleared
+   */
+  @Output() fileCleared = new EventEmitter<void>();
 
   // Upload limits from environment
   private readonly maxFileSize = environment.upload.maxFileSize;
@@ -124,31 +139,31 @@ export class UploadAvatarComponent {
 
       // 1. Validate file type
       if (!this.isValidFileType(file)) {
-        throw new Error('Неподдерживаемый формат. Используйте JPEG, PNG или WebP');
+        throw new Error('РќРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ С„РѕСЂРјР°С‚. РСЃРїРѕР»СЊР·СѓР№С‚Рµ JPEG, PNG РёР»Рё WebP');
       }
 
       // 2. Validate file size
       if (file.size > this.maxFileSize) {
         const maxMB = (this.maxFileSize / (1024 * 1024)).toFixed(0);
-        throw new Error(`Файл слишком большой. Максимум ${maxMB} МБ`);
+        throw new Error(`Р¤Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№. РњР°РєСЃРёРјСѓРј ${maxMB} РњР‘`);
       }
 
       // 3. Validate image dimensions
       const dimensions = await this.getImageDimensions(file);
       if (dimensions.width < this.minDimension || dimensions.height < this.minDimension) {
         throw new Error(
-          `Изображение слишком маленькое. Минимум ${this.minDimension}×${this.minDimension} пикселей`
+          `РР·РѕР±СЂР°Р¶РµРЅРёРµ СЃР»РёС€РєРѕРј РјР°Р»РµРЅСЊРєРѕРµ. РњРёРЅРёРјСѓРј ${this.minDimension}Г—${this.minDimension} РїРёРєСЃРµР»РµР№`
         );
       }
       if (dimensions.width > this.maxDimension || dimensions.height > this.maxDimension) {
         throw new Error(
-          `Изображение слишком большое. Максимум ${this.maxDimension}×${this.maxDimension} пикселей`
+          `РР·РѕР±СЂР°Р¶РµРЅРёРµ СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕРµ. РњР°РєСЃРёРјСѓРј ${this.maxDimension}Г—${this.maxDimension} РїРёРєСЃРµР»РµР№`
         );
       }
 
       // 4. Check for animated images (basic check)
       if (await this.isAnimated(file)) {
-        throw new Error('Анимированные изображения не поддерживаются');
+        throw new Error('РђРЅРёРјРёСЂРѕРІР°РЅРЅС‹Рµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ');
       }
 
       // 5. Create preview
@@ -160,8 +175,10 @@ export class UploadAvatarComponent {
       this._status.set('idle');
       this._errorMessage.set(null);
 
+      this.fileSelected.emit(file);
+
     } catch (error: any) {
-      this.showError(error.message || 'Ошибка валидации файла');
+      this.showError(error.message || 'РћС€РёР±РєР° РІР°Р»РёРґР°С†РёРё С„Р°Р№Р»Р°');
       // Reset input
       input.value = '';
     }
@@ -207,7 +224,7 @@ export class UploadAvatarComponent {
       }, 2000);
 
     } catch (error: any) {
-      this.showError(error.message || 'Ошибка загрузки файла');
+      this.showError(error.message || 'РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё С„Р°Р№Р»Р°');
       this.uploadError.emit(this._errorMessage()!);
     } finally {
       this._uploading.set(false);
@@ -260,7 +277,7 @@ export class UploadAvatarComponent {
 
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Не удалось загрузить изображение'));
+        reject(new Error('РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ РёР·РѕР±СЂР°Р¶РµРЅРёРµ'));
       };
 
       img.src = url;
@@ -306,7 +323,7 @@ export class UploadAvatarComponent {
       };
 
       reader.onerror = () => {
-        reject(new Error('Не удалось создать превью изображения'));
+        reject(new Error('РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РїСЂРµРІСЊСЋ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ'));
       };
 
       reader.readAsDataURL(file);
@@ -330,5 +347,6 @@ export class UploadAvatarComponent {
     this._status.set('idle');
     this._errorMessage.set(null);
     this._progress.set(0);
+    this.fileCleared.emit();
   }
 }

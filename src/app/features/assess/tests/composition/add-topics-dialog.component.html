@@ -1,0 +1,52 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Добавить топики в план</h2>
+  <button mat-icon-button (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <form>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Выберите топики</mat-label>
+      <mat-select [formControl]="topicsControl" multiple required>
+        @for (topic of data.availableTopics; track topic.id) {
+          <mat-option [value]="topic.id">{{ topic.name }}</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Можно выбрать несколько топиков</mat-hint>
+      @if (topicsControl.invalid && topicsControl.touched) {
+        <mat-error>Выберите хотя бы один топик</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Количество вопросов (для каждого топика)</mat-label>
+      <input
+        matInput
+        type="number"
+        [formControl]="targetCountControl"
+        min="1"
+        max="50"
+        required
+      >
+      <mat-hint>От 1 до 50 вопросов</mat-hint>
+      @if (targetCountControl.invalid && targetCountControl.touched) {
+        <mat-error>Введите число от 1 до 50</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Отмена</button>
+  <button
+    mat-raised-button
+    class="aqyldy-btn-mint"
+    (click)="submit()"
+    [disabled]="topicsControl.invalid || targetCountControl.invalid"
+  >
+    <mat-icon>add</mat-icon>
+    Добавить
+  </button>
+</mat-dialog-actions>

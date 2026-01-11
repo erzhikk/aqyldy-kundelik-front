@@ -21,9 +21,17 @@
     "STAFF": "Staff",
     "CLASSES": "Classes",
     "SUBJECTS": "Subjects",
+    "TESTING": "Testing",
     "TIMETABLE": "Timetable",
     "ATTENDANCE": "Attendance",
     "TESTS": "Tests"
+  },
+  "TESTING": {
+    "TITLE": "Testing",
+    "SUBTITLE": "Available tests to take",
+    "START_TEST": "Start Test",
+    "NO_TESTS": "No available tests",
+    "NO_TESTS_DESCRIPTION": "There are currently no published tests available"
   },
   "AUTH": {
     "LOGIN": "Login",
@@ -248,7 +256,36 @@
     "NOTIFY_PUBLISH_SUCCESS": "Test published successfully",
     "NOTIFY_DELETE_SUCCESS": "Test deleted successfully",
     "NOTIFY_DELETE_BLOCK": "Cannot delete test with student attempts",
-    "CONFIRM_PUBLISH": "Publish this test? After publishing, you cannot edit the test composition.",
+    "CONFIRM_PUBLISH": "Publish this test? This action is final and the composition cannot be edited later.",
+    "CONFIRM_PUBLISH_WITH_TITLE": "Publish the test \"{{title}}\"? This action is final and the composition cannot be edited later.",
     "CONFIRM_DELETE": "Are you sure you want to delete this test? This action cannot be undone."
+  },
+  "TEST_COMPOSITION": {
+    "TITLE": "Test Structure",
+    "SUBTITLE": "Manage test questions",
+    "PLAN_SECTION_TITLE": "Test Plan",
+    "PLAN_SECTION_SUBTITLE": "Define how many questions are needed per topic",
+    "PLAN_PROGRESS": "Selected {{selected}} out of {{target}} questions",
+    "PLAN_FULFILLED": "Plan fulfilled",
+    "PLAN_NOT_FULFILLED": "Plan not fulfilled",
+    "TABLE_TOPIC": "Topic",
+    "TABLE_TARGET": "Required questions",
+    "TABLE_SELECTED": "Selected",
+    "TABLE_PROGRESS": "Progress",
+    "TABLE_ACTIONS": "Actions",
+    "ACTION_ADD_TOPIC": "Add topic to plan",
+    "ACTION_GENERATE": "Generate questions automatically",
+    "ACTION_REMOVE_TOPIC": "Remove from plan",
+    "REMAINING_HINT": "Remaining to add: {{count}} questions for topic \"{{topic}}\"",
+    "NO_REMAINING": "All questions added for this topic",
+    "TOPIC_GROUP_FULFILLED": "Fulfilled",
+    "TOPIC_GROUP_IN_PROGRESS": "In progress",
+    "NOTIFY_TOPIC_ADDED": "Topic added to plan",
+    "NOTIFY_TOPIC_REMOVED": "Topic removed from plan",
+    "NOTIFY_TOPIC_EXISTS": "Topic already in plan",
+    "NOTIFY_QUESTIONS_GENERATED": "Added {{count}} questions",
+    "NOTIFY_NO_QUESTIONS": "No available questions to add",
+    "NOTIFY_GENERATION_ERROR": "Error generating questions",
+    "NOTIFY_PLAN_NOT_FULFILLED": "Test structure plan is not fulfilled"
   }
 }

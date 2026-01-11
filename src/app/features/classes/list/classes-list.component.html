@@ -70,7 +70,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayed"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayed;"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayed;" (click)="openCard(row)"></tr>
       </table>
 
       <mat-paginator

@@ -5,6 +5,16 @@ import { PagedResponse } from '../../../core/models/pagination';
 import { SubjectDto } from '../../subjects/subjects.service';
 
 /**
+ * Test Topic with questions (from backend)
+ */
+export interface TestTopicDto {
+  topicId: string;
+  topicName: string;
+  topicDescription?: string;
+  questions: TestQuestionDto[];
+}
+
+/**
  * Test DTO returned from API
  */
 export interface TestDto {
@@ -36,7 +46,7 @@ export interface TestDto {
     code: string;
     classLevel: number;
   }[];
-  questions?: TestQuestionDto[];
+  topics?: TestTopicDto[];
   createdAt: string;
   updatedAt: string;
 }
@@ -47,9 +57,20 @@ export interface TestDto {
 export interface TestQuestionDto {
   id: string;
   questionId: string;
-  questionText?: string;
+  questionText?: string; // Used when creating questions locally
+  text?: string; // Received from backend
   order: number;
   weight: number;
+  // Full question data from backend (when included)
+  choices?: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    order: number;
+  }>;
+  difficulty?: string;
+  explanation?: string;
+  topicId?: string;
 }
 
 /**
@@ -124,6 +145,50 @@ export interface TestListParams {
   q?: string;
   page?: number;
   size?: number;
+}
+
+/**
+ * Plan for a topic within a test (frontend only)
+ */
+export interface TopicPlan {
+  topicId: string;
+  topicName: string;
+  targetCount: number;           // How many questions are needed
+  selectedQuestionIds: string[]; // Which questions are already selected
+}
+
+/**
+ * Test composition plan (stored in sessionStorage only, not on backend)
+ */
+export interface TestPlan {
+  testId: string;
+  subjectId: string;
+  topicPlans: TopicPlan[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Progress summary for a topic
+ */
+export interface TopicProgress {
+  topicId: string;
+  topicName: string;
+  selected: number;
+  target: number;
+  isFulfilled: boolean;
+  percentage: number;
+}
+
+/**
+ * Overall plan progress
+ */
+export interface PlanProgress {
+  totalSelected: number;
+  totalTarget: number;
+  isFulfilled: boolean;
+  percentage: number;
+  topicProgress: TopicProgress[];
 }
 
 /**

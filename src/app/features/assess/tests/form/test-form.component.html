@@ -366,8 +366,10 @@
             color="accent"
             type="button"
             (click)="publish()"
-            [disabled]="loading || form.invalid"
-            [matTooltip]="'TEST_FORM.TOOLTIP_PUBLISH' | translate"
+            [disabled]="loading || form.invalid || !isCompositionPlanFulfilled()"
+            [matTooltip]="isCompositionPlanFulfilled() ?
+              ('TEST_FORM.TOOLTIP_PUBLISH' | translate) :
+              getPlanFulfillmentMessage()"
           >
             <mat-icon>publish</mat-icon>
             {{ 'TEST_FORM.ACTION_PUBLISH' | translate }}

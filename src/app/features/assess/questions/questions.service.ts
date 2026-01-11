@@ -116,6 +116,28 @@ export class QuestionsService {
   }
 
   /**
+   * Get questions by multiple topic IDs
+   * @param topicIds Array of topic UUIDs
+   * @param params Additional filter parameters
+   * @returns Observable of array of QuestionDto
+   */
+  getByTopics(topicIds: string[], params: { subjectId?: string; size?: number } = {}): Observable<QuestionDto[]> {
+    let httpParams = new HttpParams();
+
+    // Join topic IDs with comma
+    httpParams = httpParams.set('topicIds', topicIds.join(','));
+
+    if (params.subjectId) {
+      httpParams = httpParams.set('subjectId', params.subjectId);
+    }
+    if (params.size) {
+      httpParams = httpParams.set('size', params.size.toString());
+    }
+
+    return this.http.get<QuestionDto[]>(`${this.base}/by-topics`, { params: httpParams });
+  }
+
+  /**
    * Get one question by ID
    * @param id Question UUID
    * @returns Observable of QuestionDto

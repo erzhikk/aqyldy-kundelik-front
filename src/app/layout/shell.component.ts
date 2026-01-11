@@ -314,6 +314,11 @@ export class ShellComponent implements OnInit {
       icon: 'menu_book'
     },
     {
+      path: '/app/testing',
+      label: 'NAV.TESTING',
+      icon: 'quiz'
+    },
+    {
       path: '/app/timetable',
       label: 'NAV.TIMETABLE',
       icon: 'event',

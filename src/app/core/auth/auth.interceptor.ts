@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   HttpInterceptorFn,
   HttpRequest,
@@ -58,6 +59,7 @@ export const authInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<any>> => {
   const store = inject(TokenStorage);
   const auth = inject(AuthService);
+  const router = inject(Router);
 
   // Пропускаем auth endpoints
   if (isAuthEndpoint(req.url)) {
@@ -70,7 +72,7 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(withAuth).pipe(
     catchError((err: any) => {
       if (err instanceof HttpErrorResponse && err.status === 401) {
-        return handle401Error(withAuth, next, store, auth);
+        return handle401Error(withAuth, next, store, auth, router);
       }
       return throwError(() => err);
     })
@@ -107,14 +109,16 @@ function handle401Error(
   req: HttpRequest<any>,
   next: HttpHandlerFn,
   store: TokenStorage,
-  auth: AuthService
+  auth: AuthService,
+  router: Router
 ): Observable<HttpEvent<any>> {
   // Если refresh токена нет, сразу очищаем и выходим
-  if (!store.refresh) {
-    console.warn('[Auth Interceptor] No refresh token available, clearing session');
-    store.clear();
-    return throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }));
-  }
+    if (!store.refresh) {
+      console.warn('[Auth Interceptor] No refresh token available, clearing session');
+      store.clear();
+      router.navigate(['/']);
+      return throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' }));
+    }
 
   // Если уже идёт refresh, ждём его завершения
   if (refreshHandler.isInProgress) {
@@ -142,6 +146,7 @@ function handle401Error(
       console.error('[Auth Interceptor] Token refresh failed:', refreshError);
       refreshHandler.reset();
       store.clear();
+      router.navigate(['/']);
 
       // Можно добавить редирект на логин
       // inject(Router).navigate(['/login']);

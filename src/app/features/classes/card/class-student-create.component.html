@@ -1,0 +1,77 @@
+<h2 mat-dialog-title>Add Student</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="avatar-section">
+      <app-upload-avatar
+        [userId]="temporaryUserId"
+        [size]="'medium'"
+        [uploadMode]="'manual'"
+        (fileSelected)="onAvatarSelected($event)"
+        (fileCleared)="onAvatarCleared()"
+      ></app-upload-avatar>
+    </div>
+
+    <div class="form-grid">
+      <mat-form-field appearance="outline" floatLabel="always" class="locked-field">
+        <mat-label>Class</mat-label>
+        <input matInput formControlName="classCode" [disabled]="true">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" class="locked-field">
+        <mat-label>Role</mat-label>
+        <input matInput formControlName="role" [disabled]="true">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" required autocomplete="off">
+        <mat-error *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+          Valid email is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Full Name</mat-label>
+        <input matInput formControlName="fullName" required>
+        <mat-error *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched">
+          Name must be at least 2 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          required
+          autocomplete="new-password"
+        >
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+        >
+          <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="form.get('password')?.invalid && form.get('password')?.touched">
+          Password must be at least 6 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date of Birth</mat-label>
+        <input matInput type="date" formControlName="dateOfBirth">
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+  <button mat-raised-button class="aqyldy-btn-mint" (click)="submit()" [disabled]="form.invalid || loading">
+    {{ loading ? 'Creating...' : 'Create Student' }}
+  </button>
+</mat-dialog-actions>

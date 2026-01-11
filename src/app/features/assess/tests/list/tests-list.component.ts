@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TokenStorage } from '../../../../core/auth/token-storage.service';
 
 /**
@@ -54,6 +54,7 @@ export class TestsListComponent implements OnInit {
   private subjectsApi = inject(SubjectsService);
   private tokens = inject(TokenStorage);
   private router = inject(Router);
+  private translate = inject(TranslateService);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -239,7 +240,9 @@ export class TestsListComponent implements OnInit {
    * After publishing, test composition cannot be edited
    */
   publish(test: TestDto): void {
-    if (!confirm(`Publish test "${test.title}"? After publishing, you cannot edit the test composition.`)) {
+    const title = test.title || this.translate.instant('TEST.TITLE_SINGULAR');
+    const message = this.translate.instant('TEST_FORM.CONFIRM_PUBLISH_WITH_TITLE', { title });
+    if (!confirm(message)) {
       return;
     }
 

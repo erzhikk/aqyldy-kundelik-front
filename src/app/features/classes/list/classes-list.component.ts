@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ClassesService, ClassDto } from '../classes.service';
 import { UsersService, UserDto } from '../../users/users.service';
 import { MatTableModule } from '@angular/material/table';
@@ -42,6 +43,7 @@ export class ClassesListComponent implements OnInit {
   private usersService = inject(UsersService);
   private dialog = inject(MatDialog);
   private tokens = inject(TokenStorage);
+  private router = inject(Router);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -176,5 +178,12 @@ export class ClassesListComponent implements OnInit {
         this.load();
       }
     });
+  }
+
+  /**
+   * Open class card
+   */
+  openCard(classItem: ClassDto): void {
+    this.router.navigate(['/app/classes', classItem.id, 'card']);
   }
 }
