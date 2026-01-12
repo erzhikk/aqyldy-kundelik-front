@@ -146,13 +146,13 @@ mat-progress-bar {
     .choices {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 20px;
 
       .choice-option {
         display: flex;
         align-items: flex-start;
         gap: 12px;
-        padding: 16px;
+        padding: 18px 20px;
         border: 1px solid var(--line);
         border-radius: 12px;
         cursor: pointer;

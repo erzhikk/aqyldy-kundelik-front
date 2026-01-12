@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestsService, TestDto, CreateTestBody, UpdateTestBody, ReviewPolicy } from '../tests.service';
-import { SubjectsService, SubjectDto } from '../../../subjects/subjects.service';
+import { SubjectsService, SubjectDto, ClassLevelDto } from '../../../subjects/subjects.service';
 import { ClassesService, ClassDto } from '../../../classes/classes.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +19,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotifyService } from '../../../../core/ui/notify.service';
+import { ConfirmDialogService } from '../../../../core/ui/confirm-dialog.service';
 
 /**
  * Test Form Component
@@ -65,12 +66,14 @@ export class TestFormComponent implements OnInit {
   private classesApi = inject(ClassesService);
   private notify = inject(NotifyService);
   private translate = inject(TranslateService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   form!: FormGroup;
   loading = false;
   isEditMode = false;
   testId: string | null = null;
   currentTest: TestDto | null = null;
+  classLevels: ClassLevelDto[] = [];
   subjects: SubjectDto[] = [];
   schoolClasses: ClassDto[] = [];
 
@@ -103,8 +106,9 @@ export class TestFormComponent implements OnInit {
       // Basic info
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
       description: ['', [Validators.maxLength(1000)]],
-      schoolClassIds: [[], [Validators.required, Validators.minLength(1)]],
+      classLevelId: ['', [Validators.required]],
       subjectId: ['', [Validators.required]],
+      schoolClassIds: [[], [Validators.required, Validators.minLength(1)]],
 
       // Scheduling
       opensAt: [null],
@@ -123,21 +127,87 @@ export class TestFormComponent implements OnInit {
       reviewPolicy: ['AFTER_SUBMIT' as ReviewPolicy, [Validators.required]]
     }, { validators: this.validateTestSchedule.bind(this) });
 
-    // Load school classes and subjects
-    this.loadSchoolClasses();
-    this.loadSubjects();
+    // Disable subject and classes fields until class level is selected
+    this.form.get('subjectId')?.disable();
+    this.form.get('schoolClassIds')?.disable();
 
-    // Load test data if in edit mode
+    // Load class levels
+    this.loadClassLevels();
+
+    // Load test data if in edit mode (before subscribing to changes)
     if (this.isEditMode && this.testId) {
       this.loadTest(this.testId);
+    }
+
+    // Subscribe to class level changes (after initial load to avoid reset on edit)
+    this.form.get('classLevelId')?.valueChanges.subscribe(classLevelId => {
+      this.onClassLevelChange(classLevelId);
+    });
+  }
+
+  /**
+   * Load class levels for dropdown
+   */
+  loadClassLevels(): void {
+    this.subjectsApi.getClassLevels().subscribe({
+      next: (classLevels) => {
+        this.classLevels = classLevels;
+      },
+      error: (err) => {
+        console.error('Error loading class levels:', err);
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_CLASS_LEVELS_FAIL'));
+        this.classLevels = [];
+      }
+    });
+  }
+
+  /**
+   * Handle class level change
+   */
+  onClassLevelChange(classLevelId: string): void {
+    // Reset subject and classes
+    this.form.patchValue({
+      subjectId: '',
+      schoolClassIds: []
+    });
+
+    // Clear previous data
+    this.subjects = [];
+    this.schoolClasses = [];
+
+    if (classLevelId) {
+      // Enable and load subject and classes
+      this.form.get('subjectId')?.enable();
+      this.form.get('schoolClassIds')?.enable();
+      this.loadSubjectsByClassLevel(classLevelId);
+      this.loadClassesByClassLevel(classLevelId);
+    } else {
+      // Disable if no class level selected
+      this.form.get('subjectId')?.disable();
+      this.form.get('schoolClassIds')?.disable();
     }
   }
 
   /**
-   * Load school classes for dropdown
+   * Load subjects by class level
    */
-  loadSchoolClasses(): void {
-    this.classesApi.listAll().subscribe({
+  loadSubjectsByClassLevel(classLevelId: string): void {
+    this.subjectsApi.getByClassLevel(classLevelId).subscribe({
+      next: (subjects) => {
+        this.subjects = subjects;
+      },
+      error: () => {
+        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SUBJECTS_FAIL'));
+        this.subjects = [];
+      }
+    });
+  }
+
+  /**
+   * Load classes by class level
+   */
+  loadClassesByClassLevel(classLevelId: string): void {
+    this.classesApi.getByClassLevel(classLevelId).subscribe({
       next: (schoolClasses) => {
         this.schoolClasses = schoolClasses;
       },
@@ -145,25 +215,6 @@ export class TestFormComponent implements OnInit {
         console.error('Error loading school classes:', err);
         this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SCHOOL_CLASSES_FAIL'));
         this.schoolClasses = [];
-      }
-    });
-  }
-
-  /**
-   * Load all subjects from API
-   */
-  loadSubjects(): void {
-    this.subjectsApi.list().subscribe({
-      next: (response: any) => {
-        // Handle both array and paginated response
-        const subjects = Array.isArray(response)
-          ? response
-          : (response?.content ?? response?.data ?? []);
-        this.subjects = subjects;
-      },
-      error: () => {
-        this.notify.error(this.translate.instant('TEST_FORM.NOTIFY_SUBJECTS_FAIL'));
-        this.subjects = [];
       }
     });
   }
@@ -198,7 +249,20 @@ export class TestFormComponent implements OnInit {
           closesTime = this.formatTimeForInput(closesDateTime);
         }
 
-        // Set form values
+        // Set form values (classLevelId first to trigger loading of subjects and classes)
+        if (test.classLevelId) {
+          this.form.patchValue({
+            classLevelId: test.classLevelId
+          });
+          // Enable subject and classes fields
+          this.form.get('subjectId')?.enable();
+          this.form.get('schoolClassIds')?.enable();
+          // Load subjects and classes for this level
+          this.loadSubjectsByClassLevel(test.classLevelId);
+          this.loadClassesByClassLevel(test.classLevelId);
+        }
+
+        // Set other form values
         this.form.patchValue({
           name: test.name || test.title || '',
           description: test.description || '',
@@ -260,7 +324,8 @@ export class TestFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const formValue = this.form.value;
+    // Use getRawValue to include disabled fields (subjectId and schoolClassIds may be disabled)
+    const formValue = this.form.getRawValue();
 
     // Combine date and time for opensAt
     let opensAtISO: string | null = null;
@@ -281,6 +346,7 @@ export class TestFormComponent implements OnInit {
       const body: UpdateTestBody = {
         name: formValue.name,
         description: formValue.description || null,
+        classLevelId: formValue.classLevelId,
         subjectId: formValue.subjectId,
         schoolClassIds: formValue.schoolClassIds,
         durationSec: formValue.durationSec,
@@ -309,6 +375,7 @@ export class TestFormComponent implements OnInit {
       const body: CreateTestBody = {
         name: formValue.name,
         description: formValue.description || null,
+        classLevelId: formValue.classLevelId,
         subjectId: formValue.subjectId,
         schoolClassIds: formValue.schoolClassIds,
         durationSec: formValue.durationSec,
@@ -348,20 +415,24 @@ export class TestFormComponent implements OnInit {
       return;
     }
 
-    if (!confirm(this.translate.instant('TEST_FORM.CONFIRM_PUBLISH'))) {
-      return;
-    }
+    this.confirmDialog.confirmPublish(
+      this.translate.instant('TEST_FORM.CONFIRM_PUBLISH')
+    ).subscribe({
+      next: (confirmed) => {
+        if (!confirmed) return;
 
-    this.loading = true;
-    this.testsApi.publish(this.testId).subscribe({
-      next: () => {
-        this.loading = false;
-        this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_PUBLISH_SUCCESS'));
-        this.goBack();
-      },
-      error: () => {
-        this.loading = false;
-        // Error handled by interceptor
+        this.loading = true;
+        this.testsApi.publish(this.testId!).subscribe({
+          next: () => {
+            this.loading = false;
+            this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_PUBLISH_SUCCESS'));
+            this.goBack();
+          },
+          error: () => {
+            this.loading = false;
+            // Error handled by interceptor
+          }
+        });
       }
     });
   }
@@ -429,21 +500,23 @@ export class TestFormComponent implements OnInit {
       return;
     }
 
-    if (!confirm(this.translate.instant('TEST_FORM.CONFIRM_DELETE'))) {
-      return;
-    }
+    this.confirmDialog.confirmDelete(
+      this.translate.instant('TEST_FORM.CONFIRM_DELETE')
+    ).subscribe(confirmed => {
+      if (!confirmed) return;
 
-    this.loading = true;
-    this.testsApi.delete(this.testId).subscribe({
-      next: () => {
-        this.loading = false;
-        this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_DELETE_SUCCESS'));
-        this.goBack();
-      },
-      error: () => {
-        this.loading = false;
-        // Error handled by interceptor (409 if has attempts)
-      }
+      this.loading = true;
+      this.testsApi.delete(this.testId!).subscribe({
+        next: () => {
+          this.loading = false;
+          this.notify.success(this.translate.instant('TEST_FORM.NOTIFY_DELETE_SUCCESS'));
+          this.goBack();
+        },
+        error: () => {
+          this.loading = false;
+          // Error handled by interceptor (409 if has attempts)
+        }
+      });
     });
   }
 

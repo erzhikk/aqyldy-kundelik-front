@@ -105,6 +105,7 @@ export type ReviewPolicy = 'AFTER_SUBMIT' | 'AFTER_CLOSE' | 'NEVER';
 export interface CreateTestBody {
   name: string;
   description?: string | null;
+  classLevelId: string;
   subjectId: string;
   schoolClassIds: string[];
   durationSec: number;
@@ -123,6 +124,7 @@ export interface CreateTestBody {
 export interface UpdateTestBody {
   name?: string;
   description?: string | null;
+  classLevelId?: string;
   subjectId?: string;
   schoolClassIds?: string[];
   durationSec?: number;

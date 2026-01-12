@@ -16,7 +16,8 @@ import { TokenStorage } from '../../../core/auth/token-storage.service';
   selector: 'app-quick-actions',
   imports: [CommonModule],
   template: `
-    <div class="quick-actions-card">
+    @if (hasQuickActions()) {
+      <div class="quick-actions-card">
       <div class="quick-actions-title">Quick Actions</div>
       <div class="quick-actions-buttons">
       @if (can('ADMIN', 'SUPER_ADMIN')) {
@@ -50,6 +51,7 @@ import { TokenStorage } from '../../../core/auth/token-storage.service';
       }
       </div>
     </div>
+    }
   `,
   styles: [`
     .quick-actions-card {
@@ -134,6 +136,10 @@ export class QuickActionsWidget {
     const payload = this.tokens.decode() as any;
     const userRoles = payload?.roles ?? [];
     return roles.some(role => userRoles.includes(role));
+  }
+
+  hasQuickActions(): boolean {
+    return this.can('ADMIN', 'SUPER_ADMIN', 'ADMIN_SCHEDULE', 'TEACHER');
   }
 
   /**

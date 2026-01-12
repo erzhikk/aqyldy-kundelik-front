@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { QuickActionsWidget } from './widgets/quick-actions.widget';
 import { TodayLessonsWidget } from './widgets/today-lessons.widget';
 import { TokenStorage } from '../../core/auth/token-storage.service';
+import { LastTestCardComponent } from '../assess/analytics/student/last-test-card.component';
 
 /**
  * Dashboard Page (Container)
@@ -15,7 +16,7 @@ import { TokenStorage } from '../../core/auth/token-storage.service';
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [CommonModule, QuickActionsWidget, TodayLessonsWidget],
+  imports: [CommonModule, QuickActionsWidget, TodayLessonsWidget, LastTestCardComponent],
   template: `
     <div class="dashboard-container">
       <!-- Header -->
@@ -31,6 +32,11 @@ import { TokenStorage } from '../../core/auth/token-storage.service';
       <div class="grid gap-4 md:grid-cols-2">
         <!-- Quick Actions (full width) -->
         <app-quick-actions class="md:col-span-2"></app-quick-actions>
+
+        <!-- Student Analytics Widget -->
+        @if (isStudent()) {
+          <app-last-test-card class="md:col-span-2"></app-last-test-card>
+        }
 
         <!-- Today's Lessons (teachers only) -->
         @if (isTeacher()) {
@@ -249,5 +255,14 @@ export class DashboardComponent {
     const payload = this.tokens.decode() as any;
     const roles = payload?.roles ?? [];
     return roles.includes('TEACHER');
+  }
+
+  /**
+   * Check if current user is a student
+   */
+  isStudent(): boolean {
+    const payload = this.tokens.decode() as any;
+    const roles = payload?.roles ?? [];
+    return roles.includes('STUDENT');
   }
 }

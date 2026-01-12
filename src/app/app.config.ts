@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors, HttpClient } from '@angular/common
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideEcharts } from 'ngx-echarts';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
@@ -50,6 +51,7 @@ export const appConfig: ApplicationConfig = {
           deps: [HttpClient]
         }
       })
-    )
+    ),
+    provideEcharts()
   ]
 };

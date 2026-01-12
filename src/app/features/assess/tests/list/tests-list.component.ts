@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TokenStorage } from '../../../../core/auth/token-storage.service';
+import { ConfirmDialogService } from '../../../../core/ui/confirm-dialog.service';
 
 /**
  * Tests List Component
@@ -55,6 +56,7 @@ export class TestsListComponent implements OnInit {
   private tokens = inject(TokenStorage);
   private router = inject(Router);
   private translate = inject(TranslateService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -223,15 +225,19 @@ export class TestsListComponent implements OnInit {
    * Will show error via interceptor if test has attempts (409 Conflict)
    */
   delete(test: TestDto): void {
-    if (!confirm(`Are you sure you want to delete test "${test.title}"?`)) {
-      return;
-    }
+    const message = `Are you sure you want to delete test "${test.title}"?`;
 
-    this.testsApi.delete(test.id).subscribe({
-      next: () => {
-        this.load(); // Reload list
+    this.confirmDialog.confirmDelete(message).subscribe({
+      next: (confirmed) => {
+        if (!confirmed) return;
+
+        this.testsApi.delete(test.id).subscribe({
+          next: () => {
+            this.load(); // Reload list
+          }
+          // Error handled automatically by interceptor (409 if has attempts)
+        });
       }
-      // Error handled automatically by interceptor (409 if has attempts)
     });
   }
 
@@ -240,15 +246,18 @@ export class TestsListComponent implements OnInit {
    * After publishing, test composition cannot be edited
    */
   publish(test: TestDto): void {
-    const title = test.title || this.translate.instant('TEST.TITLE_SINGULAR');
+    const title = test.name || this.translate.instant('TEST.TITLE_SINGULAR');
     const message = this.translate.instant('TEST_FORM.CONFIRM_PUBLISH_WITH_TITLE', { title });
-    if (!confirm(message)) {
-      return;
-    }
 
-    this.testsApi.publish(test.id).subscribe({
-      next: () => {
-        this.load(); // Reload list
+    this.confirmDialog.confirmPublish(message).subscribe({
+      next: (confirmed) => {
+        if (!confirmed) return;
+
+        this.testsApi.publish(test.id).subscribe({
+          next: () => {
+            this.load(); // Reload list
+          }
+        });
       }
     });
   }

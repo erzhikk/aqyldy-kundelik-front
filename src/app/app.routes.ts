@@ -92,6 +92,31 @@ export const routes: Routes = [
       {
         path: 'attempts/:attemptId/result',
         loadComponent: () => import('./features/assess/taking/test-result.component').then(m => m.TestResultComponent)
+      },
+      // Analytics routes
+      {
+        path: 'analytics',
+        loadComponent: () => import('./features/assess/analytics/student/student-analytics.component').then(m => m.StudentAnalyticsComponent)
+      },
+      {
+        path: 'analytics/attempt/:attemptId',
+        loadComponent: () => import('./features/assess/analytics/student/attempt-details.component').then(m => m.AttemptDetailsComponent)
+      },
+      {
+        path: 'analytics/attempt/:attemptId/topic/:topicId',
+        loadComponent: () => import('./features/assess/analytics/student/topic-drilldown.component').then(m => m.TopicDrilldownComponent)
+      },
+      {
+        path: 'analytics/classes',
+        loadComponent: () => import('./features/assess/analytics/teacher/teacher-classes-list.component').then(m => m.TeacherClassesListComponent)
+      },
+      {
+        path: 'analytics/classes/:classId',
+        loadComponent: () => import('./features/assess/analytics/teacher/class-analytics.component').then(m => m.ClassAnalyticsComponent)
+      },
+      {
+        path: 'analytics/classes/:classId/test/:testId/topic/:topicId',
+        loadComponent: () => import('./features/assess/analytics/teacher/class-topic-drilldown.component').then(m => m.ClassTopicDrilldownComponent)
       }
     ]
   },

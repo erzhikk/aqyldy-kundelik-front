@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AnalyticsService, TopicPerformanceDto } from './analytics.service';
 import { SubjectsService, SubjectDto } from '../../subjects/subjects.service';
 import { NotifyService } from '../../../core/ui/notify.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export type TimePeriod = 'month' | 'quarter' | 'year';
 
@@ -39,12 +40,13 @@ interface PeriodOption {
     MatProgressSpinnerModule
   ]
 })
-export class StudentTopicPerformanceComponent implements OnInit {
+export class StudentTopicPerformanceComponent implements OnInit, OnChanges {
   @Input({ required: true }) studentId!: string;
 
   private analyticsApi = inject(AnalyticsService);
   private subjectsApi = inject(SubjectsService);
   private notify = inject(NotifyService);
+  private destroyRef = inject(DestroyRef);
 
   // State signals
   private _topics = signal<TopicPerformanceDto[]>([]);
@@ -72,13 +74,23 @@ export class StudentTopicPerformanceComponent implements OnInit {
     this.loadTopicPerformance();
 
     // Listen to filter changes
-    this.subjectControl.valueChanges.subscribe(() => {
-      this.loadTopicPerformance();
-    });
+    this.subjectControl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadTopicPerformance();
+      });
 
-    this.periodControl.valueChanges.subscribe(() => {
+    this.periodControl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadTopicPerformance();
+      });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['studentId'] && !changes['studentId'].isFirstChange()) {
       this.loadTopicPerformance();
-    });
+    }
   }
 
   /**
@@ -99,6 +111,11 @@ export class StudentTopicPerformanceComponent implements OnInit {
    * Load topic performance data
    */
   loadTopicPerformance(): void {
+    if (!this.studentId) {
+      this._loading.set(false);
+      this._topics.set([]);
+      return;
+    }
     this._loading.set(true);
 
     const period = this.periodControl.value || 'month';

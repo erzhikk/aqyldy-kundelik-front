@@ -83,6 +83,15 @@ export class ClassesService {
   }
 
   /**
+   * Get classes by class level ID (for dropdowns/selects)
+   * @param classLevelId Class level UUID
+   * @returns Observable of ClassDto array filtered by class level
+   */
+  getByClassLevel(classLevelId: string): Observable<ClassDto[]> {
+    return this.http.get<ClassDto[]>(`${this.base}/by-class-level/${classLevelId}`);
+  }
+
+  /**
    * Get paginated list of all classes
    * @param page Page number (0-indexed)
    * @param size Page size
