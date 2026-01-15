@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDividerModule } from '@angular/material/divider';
 import { AnalyticsService, TopicDrillDownDto, QuestionResultDto } from '../analytics.service';
+import { AiTopicHelpCardComponent } from './ai-topic-help-card.component';
 import { NotifyService } from '../../../../core/ui/notify.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -28,6 +29,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatProgressSpinnerModule,
     MatExpansionModule,
     MatDividerModule,
+    AiTopicHelpCardComponent,
     TranslateModule
   ],
   template: `
@@ -62,6 +64,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       }
 
       @if (!loading() && topicData()) {
+        <app-ai-topic-help-card
+          [attemptId]="attemptId()"
+          [topicId]="topicId()"
+          [topicName]="topicData()?.topicName"
+        ></app-ai-topic-help-card>
+
         <mat-card class="questions-card">
           <mat-card-header>
             <mat-card-title>

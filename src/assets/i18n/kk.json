@@ -66,7 +66,12 @@
     "DRILLDOWN_QUESTION_LABEL": "Сұрақ",
     "DRILLDOWN_YOUR_ANSWER": "Сіздің жауабыңыз",
     "DRILLDOWN_CORRECT_ANSWER": "Дұрыс жауап",
-    "DRILLDOWN_EXPLANATION": "Түсіндірме"
+    "DRILLDOWN_EXPLANATION": "Түсіндірме",
+    "AI_TITLE": "AI коуч — Әлсіз тақырыптар жоспары",
+    "AI_PLAN_BUTTON": "Жоспар құру",
+    "AI_TOPIC_HELP_TITLE": "Тақырып бойынша қателер талдауы",
+    "AI_LIMIT_REACHED": "Бүгінгі лимит таусылды",
+    "AI_CACHED_HINT": "кэштен"
   },
   "AUTH": {
     "LOGIN": "Кіру",

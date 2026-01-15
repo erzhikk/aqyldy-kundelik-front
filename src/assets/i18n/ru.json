@@ -66,7 +66,12 @@
     "DRILLDOWN_QUESTION_LABEL": "Вопрос",
     "DRILLDOWN_YOUR_ANSWER": "Ваш ответ",
     "DRILLDOWN_CORRECT_ANSWER": "Правильный ответ",
-    "DRILLDOWN_EXPLANATION": "Объяснение"
+    "DRILLDOWN_EXPLANATION": "Объяснение",
+    "AI_TITLE": "ИИ-коуч — План по слабым темам",
+    "AI_PLAN_BUTTON": "Сгенерировать план",
+    "AI_TOPIC_HELP_TITLE": "Разбор ошибок по теме",
+    "AI_LIMIT_REACHED": "Лимит на сегодня исчерпан",
+    "AI_CACHED_HINT": "из кеша"
   },
   "AUTH": {
     "LOGIN": "Войти",

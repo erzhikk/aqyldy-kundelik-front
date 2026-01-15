@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TopicsChartComponent } from './topics-chart.component';
+import { AiPlanCardComponent } from './ai-plan-card.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -19,6 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatButtonModule,
     MatIconModule,
     TopicsChartComponent,
+    AiPlanCardComponent,
     TranslateModule
   ],
   template: `
@@ -34,6 +36,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
       </div>
 
       <div class="details-content">
+        <app-ai-plan-card [attemptId]="attemptId()"></app-ai-plan-card>
         <app-topics-chart [attemptId]="attemptId()"></app-topics-chart>
       </div>
     </div>
