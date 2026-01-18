@@ -8,7 +8,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AiCoachService, AiGeneratedDto, AiTopicHelpRequestDto } from '../ai-coach.service';
+import { AiCoachService, AiTopicHelpRequestDto, AiTopicHelpResult } from '../ai-coach.service';
+import { NotifyService } from '../../../../core/ui/notify.service';
 
 type AiHelpMode = 'coach' | 'short' | 'practice';
 
@@ -31,8 +32,8 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
           <mat-icon>psychology_alt</mat-icon>
           {{ 'ANALYTICS.AI_TOPIC_HELP_TITLE' | translate }}
         </mat-card-title>
-        @if (topicName) {
-          <mat-card-subtitle>{{ topicName }}</mat-card-subtitle>
+        @if (displayTopicName()) {
+          <mat-card-subtitle>{{ displayTopicName() }}</mat-card-subtitle>
         }
       </mat-card-header>
 
@@ -44,7 +45,7 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
             (click)="generateHelp('coach')"
             [disabled]="loading() || !attemptId || !topicId"
           >
-            Объясни
+            {{ 'ANALYTICS.AI_TOPIC_HELP_COACH' | translate }}
           </button>
           <button
             mat-stroked-button
@@ -52,7 +53,7 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
             (click)="generateHelp('short')"
             [disabled]="loading() || !attemptId || !topicId"
           >
-            Коротко
+            {{ 'ANALYTICS.AI_TOPIC_HELP_SHORT' | translate }}
           </button>
           <button
             mat-stroked-button
@@ -60,7 +61,7 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
             (click)="generateHelp('practice')"
             [disabled]="loading() || !attemptId || !topicId"
           >
-            Дай тренажёр
+            {{ 'ANALYTICS.AI_TOPIC_HELP_PRACTICE' | translate }}
           </button>
 
           @if (loading()) {
@@ -78,11 +79,68 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
         @if (result()) {
           <div class="result-state">
             <div class="result-meta">
-              @if (result()!.cached) {
+              @if (isCached(result())) {
                 <mat-chip class="cached-chip">{{ 'ANALYTICS.AI_CACHED_HINT' | translate }}</mat-chip>
               }
             </div>
-            <pre class="ai-text">{{ result()!.content }}</pre>
+            <div class="topic-sections">
+              @if (result()!.mainError) {
+                <section class="warning-box">
+                  <h4>{{ 'ANALYTICS.AI_MAIN_ERROR_TITLE' | translate }}</h4>
+                  <p>{{ result()!.mainError }}</p>
+                </section>
+              }
+
+              @if (result()!.explanation) {
+                <section class="topic-section">
+                  <h3>{{ 'ANALYTICS.AI_EXPLANATION_TITLE' | translate }}</h3>
+                  <p class="section-text">{{ result()!.explanation }}</p>
+                </section>
+              }
+
+              @if (result()!.examples.length) {
+                <section class="topic-section">
+                  <h3>{{ 'ANALYTICS.AI_EXAMPLES_TITLE' | translate }}</h3>
+                  <div class="example-grid">
+                    @for (example of result()!.examples; track example.question) {
+                      <div class="example-card">
+                        <p class="label">{{ 'ANALYTICS.AI_EXAMPLE_QUESTION' | translate }}</p>
+                        <p class="value">{{ example.question }}</p>
+                        <p class="label">{{ 'ANALYTICS.AI_EXAMPLE_SOLUTION' | translate }}</p>
+                        <p class="value">{{ example.solution }}</p>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+
+              @if (result()!.practice.length) {
+                <section class="topic-section">
+                  <h3>{{ 'ANALYTICS.AI_PRACTICE_TITLE' | translate }}</h3>
+                  <div class="practice-list">
+                    @for (item of result()!.practice; track item.question; let idx = $index) {
+                      <div class="practice-card">
+                        <p class="label">{{ 'ANALYTICS.AI_PRACTICE_QUESTION' | translate }}</p>
+                        <p class="value">{{ item.question }}</p>
+                        <button mat-stroked-button class="answer-toggle" (click)="togglePracticeAnswer(idx)">
+                          {{
+                            isPracticeAnswerVisible(idx)
+                              ? ('ANALYTICS.AI_HIDE_ANSWER' | translate)
+                              : ('ANALYTICS.AI_SHOW_ANSWER' | translate)
+                          }}
+                        </button>
+                        @if (isPracticeAnswerVisible(idx)) {
+                          <div class="answer-box">
+                            <p class="label">{{ 'ANALYTICS.AI_PRACTICE_ANSWER' | translate }}</p>
+                            <p class="value">{{ item.answer }}</p>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
           </div>
         }
       </mat-card-content>
@@ -152,17 +210,92 @@ type AiHelpMode = 'coach' | 'short' | 'practice';
       border: 1px solid #7dd3fc;
     }
 
-    .ai-text {
-      margin: 12px 0 0;
-      white-space: pre-wrap;
-      font-family: inherit;
-      font-size: 14px;
+    .topic-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .topic-section {
+      h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+      }
+    }
+
+    .section-text {
+      margin: 0;
+      color: #475569;
       line-height: 1.6;
-      color: #1f2937;
-      background: #f8fafc;
+    }
+
+    .warning-box {
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
       border-radius: 12px;
-      padding: 16px;
+      padding: 12px 14px;
+
+      h4 {
+        margin: 0 0 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #92400e;
+      }
+
+      p {
+        margin: 0;
+        color: #92400e;
+        line-height: 1.6;
+      }
+    }
+
+    .example-grid,
+    .practice-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .example-card,
+    .practice-card {
       border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+    }
+
+    .label {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .value {
+      margin: 0 0 10px;
+      color: #0f172a;
+      line-height: 1.5;
+    }
+
+    .answer-toggle {
+      margin-bottom: 10px;
+    }
+
+    .answer-box {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #ecfeff;
+      border: 1px solid #a5f3fc;
+
+      .value {
+        margin: 0;
+        color: #0f172a;
+      }
     }
 
     .error-state {
@@ -206,6 +339,7 @@ export class AiTopicHelpCardComponent implements OnChanges {
   private aiCoach = inject(AiCoachService);
   private translate = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private notify = inject(NotifyService);
 
   private _loading = signal(false);
   loading = computed(() => this._loading());
@@ -213,11 +347,12 @@ export class AiTopicHelpCardComponent implements OnChanges {
   private _errorMessage = signal<string | null>(null);
   errorMessage = computed(() => this._errorMessage());
 
-  private _result = signal<AiGeneratedDto | null>(null);
+  private _result = signal<AiTopicHelpResult | null>(null);
   result = computed(() => this._result());
 
   private _mode = signal<AiHelpMode>('coach');
   mode = computed(() => this._mode());
+  private _practiceVisibility = signal<Record<number, boolean>>({});
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['attemptId'] || changes['topicId']) {
@@ -238,6 +373,7 @@ export class AiTopicHelpCardComponent implements OnChanges {
     this._mode.set(mode);
     this._loading.set(true);
     this._errorMessage.set(null);
+    this._practiceVisibility.set({});
 
     this.aiCoach.generateTopicHelp(this.attemptId, this.topicId, payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -248,16 +384,13 @@ export class AiTopicHelpCardComponent implements OnChanges {
         },
         error: (error: HttpErrorResponse) => {
           this._loading.set(false);
-          this._errorMessage.set(this.getErrorMessage(error));
+          if (error.status === 429) {
+            this.notify.warning(this.translate.instant('ANALYTICS.AI_LIMIT_REACHED'));
+            return;
+          }
+          this._errorMessage.set(this.translate.instant('ANALYTICS.AI_SERVER_ERROR'));
         }
       });
-  }
-
-  private getErrorMessage(error: HttpErrorResponse): string {
-    if (error.status === 429) {
-      return this.translate.instant('ANALYTICS.AI_LIMIT_REACHED');
-    }
-    return 'Не удалось получить ответ';
   }
 
   private getLanguage(): string | undefined {
@@ -270,5 +403,26 @@ export class AiTopicHelpCardComponent implements OnChanges {
     this._errorMessage.set(null);
     this._result.set(null);
     this._mode.set('coach');
+    this._practiceVisibility.set({});
+  }
+
+  displayTopicName(): string | null {
+    return this.result()?.topic?.topicName || this.topicName || null;
+  }
+
+  isCached(result: AiTopicHelpResult | null): boolean {
+    return !!(result as { cached?: boolean } | null)?.cached;
+  }
+
+  togglePracticeAnswer(index: number): void {
+    const current = this._practiceVisibility();
+    this._practiceVisibility.set({
+      ...current,
+      [index]: !current[index]
+    });
+  }
+
+  isPracticeAnswerVisible(index: number): boolean {
+    return !!this._practiceVisibility()[index];
   }
 }

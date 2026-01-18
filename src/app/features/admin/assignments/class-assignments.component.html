@@ -1,0 +1,125 @@
+<div class="assignments-container">
+  <div class="assignments-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="goBack()" matTooltip="{{ 'COMMON.BACK' | translate }}">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h2>{{ classCode() }} - {{ 'ADMIN.ASSIGNMENTS.TITLE' | translate }}</h2>
+        <p class="subtitle">{{ 'ADMIN.ASSIGNMENTS.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
+    <div class="header-right">
+      @if (unassignedCount() > 0) {
+        <div class="warning-badge">
+          <mat-icon>warning</mat-icon>
+          <span>{{ unassignedCount() }} {{ 'ADMIN.ASSIGNMENTS.UNASSIGNED' | translate }}</span>
+        </div>
+      }
+      <button mat-stroked-button (click)="goToSchedule()">
+        <mat-icon>calendar_today</mat-icon>
+        {{ 'ADMIN.ASSIGNMENTS.GO_TO_SCHEDULE' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (assignments().length === 0) {
+    <div class="empty-state">
+      <mat-icon>assignment</mat-icon>
+      <p>{{ 'ADMIN.ASSIGNMENTS.NO_SUBJECTS' | translate }}</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table mat-table [dataSource]="assignments()">
+        <!-- Subject Column -->
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef>{{ 'ADMIN.ASSIGNMENTS.SUBJECT' | translate }}</th>
+          <td mat-cell *matCellDef="let item">
+            <span class="subject-name">{{ item.subjectNameRu }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Teacher Column -->
+        <ng-container matColumnDef="teacher">
+          <th mat-header-cell *matHeaderCellDef>{{ 'ADMIN.ASSIGNMENTS.TEACHER' | translate }}</th>
+          <td mat-cell *matCellDef="let item">
+            <mat-form-field appearance="outline" class="teacher-input">
+              <input matInput
+                     [formControl]="item.searchControl"
+                     [matAutocomplete]="auto"
+                     [placeholder]="'ADMIN.ASSIGNMENTS.SEARCH_TEACHER' | translate">
+              <mat-autocomplete #auto="matAutocomplete"
+                                [displayWith]="displayTeacher"
+                                (optionSelected)="selectTeacher(item, $event.option.value)">
+                @for (teacher of item.filteredTeachers; track teacher.id) {
+                  <mat-option [value]="teacher">
+                    <div class="teacher-option">
+                      <span class="teacher-name">{{ teacher.fullName }}</span>
+                      <span class="teacher-email">{{ teacher.email }}</span>
+                    </div>
+                  </mat-option>
+                }
+                @if (item.searching) {
+                  <mat-option disabled>
+                    <mat-spinner diameter="20"></mat-spinner>
+                    {{ 'COMMON.LOADING' | translate }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+              @if (item.searching) {
+                <mat-icon matSuffix class="searching-icon">hourglass_empty</mat-icon>
+              }
+            </mat-form-field>
+            @if (item.teacherId && item.teacherId !== item.originalTeacherId) {
+              <span class="changed-indicator" matTooltip="{{ 'ADMIN.ASSIGNMENTS.CHANGED' | translate }}">*</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let item">
+            @if (item.teacherId) {
+              <button mat-icon-button
+                      color="warn"
+                      (click)="clearTeacher(item)"
+                      matTooltip="{{ 'ADMIN.ASSIGNMENTS.CLEAR_TEACHER' | translate }}">
+                <mat-icon>clear</mat-icon>
+              </button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.unassigned]="!row.teacherId"
+            [class.changed]="row.teacherId !== row.originalTeacherId"></tr>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button mat-stroked-button
+              [disabled]="!hasChanges() || saving()"
+              (click)="reset()">
+        <mat-icon>undo</mat-icon>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button mat-raised-button
+              color="primary"
+              [disabled]="!hasChanges() || saving()"
+              (click)="save()">
+        @if (saving()) {
+          <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  }
+</div>

@@ -5,10 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AiCoachService, AiGeneratedDto, AiPlanRequestDto } from '../ai-coach.service';
+import { AiCoachService, AiPlanRequestDto, AiPlanResult } from '../ai-coach.service';
+import { NotifyService } from '../../../../core/ui/notify.service';
 
 @Component({
   standalone: true,
@@ -20,6 +22,7 @@ import { AiCoachService, AiGeneratedDto, AiPlanRequestDto } from '../ai-coach.se
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
+    MatExpansionModule,
     TranslateModule
   ],
   template: `
@@ -58,125 +61,104 @@ import { AiCoachService, AiGeneratedDto, AiPlanRequestDto } from '../ai-coach.se
         @if (result()) {
           <div class="result-state">
             <div class="result-meta">
-              @if (result()!.cached) {
+
+              @if (isCached(result())) {
                 <mat-chip class="cached-chip">{{ 'ANALYTICS.AI_CACHED_HINT' | translate }}</mat-chip>
               }
             </div>
-            <pre class="ai-text">{{ result()!.content }}</pre>
+            <div class="plan-sections">
+              @if (result()!.weakTopics.length) {
+                <section class="plan-section">
+                  <h3>{{ 'ANALYTICS.AI_WEAK_TOPICS_TITLE' | translate }}</h3>
+                  <div class="table-wrap">
+                    <table class="weak-topics-table">
+                      <thead>
+                        <tr>
+                          <th>{{ 'ANALYTICS.AI_TOPIC_COLUMN' | translate }}</th>
+                          <th>{{ 'ANALYTICS.AI_ACCURACY_COLUMN' | translate }}</th>
+                          <th>{{ 'ANALYTICS.AI_MISTAKE_COLUMN' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (topic of result()!.weakTopics; track topic.topicId) {
+                          <tr>
+                            <td class="topic-name">{{ topic.topicName }}</td>
+                            <td>
+                              <span class="accuracy-pill" [ngClass]="getAccuracyClass(topic.accuracy)">
+                                {{ formatAccuracy(topic.accuracy) }}%
+                              </span>
+                            </td>
+                            <td class="topic-mistake">{{ topic.mainMistake }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              }
+
+              @if (result()!.weeklyPlan.length) {
+                <section class="plan-section">
+                  <h3>{{ 'ANALYTICS.AI_WEEKLY_PLAN_TITLE' | translate }}</h3>
+                  <mat-accordion class="weekly-plan" multi>
+                    @for (dayPlan of result()!.weeklyPlan; track dayPlan.day) {
+                      <mat-expansion-panel>
+                        <mat-expansion-panel-header>
+                          <mat-panel-title>
+                            {{ 'ANALYTICS.AI_DAY_LABEL' | translate:{ day: dayPlan.day } }}
+                          </mat-panel-title>
+                          <mat-panel-description>
+                            <span class="plan-focus">{{ dayPlan.focus }}</span>
+                            <span class="plan-time">
+                              {{ dayPlan.timeMinutes }} {{ 'ANALYTICS.AI_MINUTES_SHORT' | translate }}
+                            </span>
+                          </mat-panel-description>
+                        </mat-expansion-panel-header>
+                        <div class="plan-body">
+                          <p class="plan-focus-text">{{ dayPlan.focus }}</p>
+                          <ul>
+                            @for (action of dayPlan.actions; track action) {
+                              <li>{{ action }}</li>
+                            }
+                          </ul>
+                        </div>
+                      </mat-expansion-panel>
+                    }
+                  </mat-accordion>
+                </section>
+              }
+
+              @if (result()!.rules.length) {
+                <section class="plan-section">
+                  <h3>{{ 'ANALYTICS.AI_RULES_TITLE' | translate }}</h3>
+                  <ul class="rules-list">
+                    @for (rule of result()!.rules; track rule) {
+                      <li>{{ rule }}</li>
+                    }
+                  </ul>
+                </section>
+              }
+
+              @if (result()!.selfCheck.length) {
+                <section class="plan-section">
+                  <h3>{{ 'ANALYTICS.AI_SELF_CHECK_TITLE' | translate }}</h3>
+                  <div class="self-check-grid">
+                    @for (item of result()!.selfCheck; track item.question) {
+                      <div class="self-check-card">
+                        <p class="question">{{ item.question }}</p>
+                        <p class="answer">{{ item.answer }}</p>
+                      </div>
+                    }
+                  </div>
+                </section>
+              }
+            </div>
           </div>
         }
       </mat-card-content>
     </mat-card>
   `,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-    }
-
-    .ai-plan-card {
-      border-radius: 16px;
-      border: 1px solid #d6e4f0;
-      background: #ffffff;
-      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.08);
-      margin-bottom: 24px;
-
-      mat-card-header {
-        padding-bottom: 16px;
-        border-bottom: 1px solid #d6e4f0;
-
-        mat-card-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 20px;
-          font-weight: 500;
-          margin: 0;
-
-          mat-icon {
-            color: #0f766e;
-            font-size: 24px;
-            width: 24px;
-            height: 24px;
-          }
-        }
-      }
-
-      mat-card-content {
-        padding: 16px 20px;
-      }
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-
-      button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-      }
-    }
-
-    .result-meta {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 8px;
-    }
-
-    .cached-chip {
-      background: #e0f2fe;
-      color: #0369a1;
-      border: 1px solid #7dd3fc;
-    }
-
-    .ai-text {
-      margin: 12px 0 0;
-      white-space: pre-wrap;
-      font-family: inherit;
-      font-size: 14px;
-      line-height: 1.6;
-      color: #1f2937;
-      background: #f8fafc;
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .error-state {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #fee2e2;
-      border: 1px solid #fca5a5;
-
-      mat-icon {
-        color: #b91c1c;
-      }
-
-      p {
-        margin: 0;
-        color: #b91c1c;
-        font-size: 14px;
-      }
-    }
-
-    .result-state {
-      margin-top: 12px;
-    }
-
-    @media (max-width: 768px) {
-      .actions {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  `]
+  styleUrls: ['./ai-plan-card.component.scss']
 })
 export class AiPlanCardComponent implements OnChanges {
   @Input({ required: true }) attemptId!: string;
@@ -184,6 +166,7 @@ export class AiPlanCardComponent implements OnChanges {
   private aiCoach = inject(AiCoachService);
   private translate = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private notify = inject(NotifyService);
 
   private _loading = signal(false);
   loading = computed(() => this._loading());
@@ -191,7 +174,7 @@ export class AiPlanCardComponent implements OnChanges {
   private _errorMessage = signal<string | null>(null);
   errorMessage = computed(() => this._errorMessage());
 
-  private _result = signal<AiGeneratedDto | null>(null);
+  private _result = signal<AiPlanResult | null>(null);
   result = computed(() => this._result());
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -222,16 +205,13 @@ export class AiPlanCardComponent implements OnChanges {
         },
         error: (error: HttpErrorResponse) => {
           this._loading.set(false);
-          this._errorMessage.set(this.getErrorMessage(error));
+          if (error.status === 429) {
+            this.notify.warning(this.translate.instant('ANALYTICS.AI_LIMIT_REACHED'));
+            return;
+          }
+          this._errorMessage.set(this.translate.instant('ANALYTICS.AI_SERVER_ERROR'));
         }
       });
-  }
-
-  private getErrorMessage(error: HttpErrorResponse): string {
-    if (error.status === 429) {
-      return this.translate.instant('ANALYTICS.AI_LIMIT_REACHED');
-    }
-    return 'Не удалось получить ответ';
   }
 
   private getLanguage(): string | undefined {
@@ -243,5 +223,31 @@ export class AiPlanCardComponent implements OnChanges {
     this._loading.set(false);
     this._errorMessage.set(null);
     this._result.set(null);
+  }
+
+  isCached(result: AiPlanResult | null): boolean {
+    return !!(result as { cached?: boolean } | null)?.cached;
+  }
+
+  getAccuracyClass(accuracy: number): string {
+    const normalized = this.normalizeAccuracy(accuracy);
+    if (normalized < 50) {
+      return 'accuracy-low';
+    }
+    if (normalized < 70) {
+      return 'accuracy-mid';
+    }
+    return 'accuracy-high';
+  }
+
+  formatAccuracy(accuracy: number): number {
+    return this.normalizeAccuracy(accuracy);
+  }
+
+  private normalizeAccuracy(accuracy: number): number {
+    if (accuracy <= 1) {
+      return Math.round(accuracy * 100);
+    }
+    return Math.round(accuracy);
   }
 }

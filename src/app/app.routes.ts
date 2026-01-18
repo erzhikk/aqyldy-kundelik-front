@@ -117,6 +117,19 @@ export const routes: Routes = [
       {
         path: 'analytics/classes/:classId/test/:testId/topic/:topicId',
         loadComponent: () => import('./features/assess/analytics/teacher/class-topic-drilldown.component').then(m => m.ClassTopicDrilldownComponent)
+      },
+      // Admin routes
+      {
+        path: 'admin/curriculum',
+        loadComponent: () => import('./features/admin/curriculum/curriculum-editor.component').then(m => m.CurriculumEditorComponent)
+      },
+      {
+        path: 'admin/classes/:classId/assignments',
+        loadComponent: () => import('./features/admin/assignments/class-assignments.component').then(m => m.ClassAssignmentsComponent)
+      },
+      {
+        path: 'admin/classes/:classId/schedule',
+        loadComponent: () => import('./features/admin/schedule/class-schedule.component').then(m => m.ClassScheduleComponent)
       }
     ]
   },

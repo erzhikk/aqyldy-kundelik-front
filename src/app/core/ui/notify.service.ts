@@ -1,4 +1,5 @@
-import { Injectable, ApplicationRef, createComponent, EnvironmentInjector } from '@angular/core';
+import { Injectable, ApplicationRef, EnvironmentInjector, inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
@@ -24,6 +25,7 @@ export interface NotificationConfig {
 export class NotifyService {
   private container: HTMLElement | null = null;
   private activeNotifications = new Set<HTMLElement>();
+  private translate = inject(TranslateService);
 
   constructor(
     private appRef: ApplicationRef,
@@ -33,31 +35,39 @@ export class NotifyService {
   }
 
   /**
+   * Translate message key or return as-is if not a key
+   */
+  private translateMessage(message: string): string {
+    const translated = this.translate.instant(message);
+    return translated !== message ? translated : message;
+  }
+
+  /**
    * Show success notification (green)
    */
   success(message: string, duration = 3000): void {
-    this.show({ message, type: 'success', duration });
+    this.show({ message: this.translateMessage(message), type: 'success', duration });
   }
 
   /**
    * Show error notification (red)
    */
   error(message: string, duration = 5000): void {
-    this.show({ message, type: 'error', duration });
+    this.show({ message: this.translateMessage(message), type: 'error', duration });
   }
 
   /**
    * Show info notification (blue)
    */
   info(message: string, duration = 3000): void {
-    this.show({ message, type: 'info', duration });
+    this.show({ message: this.translateMessage(message), type: 'info', duration });
   }
 
   /**
    * Show warning notification (orange)
    */
   warning(message: string, duration = 4000): void {
-    this.show({ message, type: 'warning', duration });
+    this.show({ message: this.translateMessage(message), type: 'warning', duration });
   }
 
   /**

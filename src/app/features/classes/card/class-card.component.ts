@@ -112,6 +112,18 @@ export class ClassCardComponent implements OnInit {
     this.router.navigate(['/app/classes']);
   }
 
+  goToAssignments(): void {
+    if (this.classId) {
+      this.router.navigate(['/app/admin/classes', this.classId, 'assignments']);
+    }
+  }
+
+  goToSchedule(): void {
+    if (this.classId) {
+      this.router.navigate(['/app/admin/classes', this.classId, 'schedule']);
+    }
+  }
+
   getTeacherName(): string {
     const classItem = this._classItem();
     return classItem?.classTeacherFullName

@@ -335,6 +335,12 @@ export class ShellComponent implements OnInit {
       label: 'NAV.TESTS',
       icon: 'assignment',
       roles: ['TEACHER', 'ADMIN', 'SUPER_ADMIN', 'ADMIN_ASSESSMENT']
+    },
+    {
+      path: '/app/admin/curriculum',
+      label: 'NAV.CURRICULUM',
+      icon: 'school',
+      roles: ['ADMIN', 'SUPER_ADMIN']
     }
   ];
 

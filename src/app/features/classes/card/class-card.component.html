@@ -11,15 +11,33 @@
         <span>Language: {{ getLangType() }}</span>
       </p>
     </div>
-    <button
-      mat-raised-button
-      class="aqyldy-btn-mint"
-      (click)="openAddStudent()"
-      [disabled]="!classItem()"
-    >
-      <mat-icon>person_add</mat-icon>
-      Add Student
-    </button>
+    <div class="header-actions">
+      <button
+        mat-stroked-button
+        (click)="goToAssignments()"
+        [disabled]="!classItem()"
+      >
+        <mat-icon>assignment_ind</mat-icon>
+        Teachers
+      </button>
+      <button
+        mat-stroked-button
+        (click)="goToSchedule()"
+        [disabled]="!classItem()"
+      >
+        <mat-icon>calendar_today</mat-icon>
+        Schedule
+      </button>
+      <button
+        mat-raised-button
+        class="aqyldy-btn-mint"
+        (click)="openAddStudent()"
+        [disabled]="!classItem()"
+      >
+        <mat-icon>person_add</mat-icon>
+        Add Student
+      </button>
+    </div>
   </div>
 
   <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>

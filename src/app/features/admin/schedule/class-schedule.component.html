@@ -1,0 +1,177 @@
+<div class="schedule-container">
+  <div class="schedule-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="goBack()" matTooltip="{{ 'COMMON.BACK' | translate }}">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h2>{{ classCode() }} - {{ 'ADMIN.SCHEDULE.TITLE' | translate }}</h2>
+        <p class="subtitle">{{ 'ADMIN.SCHEDULE.SUBTITLE' | translate }}</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-badge" [class.active]="status() === 'ACTIVE'" [class.draft]="status() === 'DRAFT'">
+        {{ status() === 'ACTIVE' ? ('ADMIN.SCHEDULE.STATUS_ACTIVE' | translate) : ('ADMIN.SCHEDULE.STATUS_DRAFT' | translate) }}
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="schedule-content">
+      <!-- Schedule Grid -->
+      <div class="grid-container">
+        <div class="grid-wrapper">
+          <table class="schedule-grid">
+            <thead>
+              <tr>
+                <th class="lesson-header">{{ 'ADMIN.SCHEDULE.LESSON' | translate }}</th>
+                @for (day of days(); track day) {
+                  <th class="day-header">
+                    <div class="day-header-content">
+                      <span>{{ dayNames[day - 1] | translate }}</span>
+                      <button mat-icon-button [matMenuTriggerFor]="dayMenu" class="day-menu-btn">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #dayMenu="matMenu">
+                        <button mat-menu-item (click)="copyDay(day)">
+                          <mat-icon>content_copy</mat-icon>
+                          {{ 'ADMIN.SCHEDULE.COPY_DAY' | translate }}
+                        </button>
+                        <button mat-menu-item (click)="clearDay(day)">
+                          <mat-icon>delete_sweep</mat-icon>
+                          {{ 'ADMIN.SCHEDULE.CLEAR_DAY' | translate }}
+                        </button>
+                      </mat-menu>
+                    </div>
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (lesson of lessons(); track lesson) {
+                <tr>
+                  <td class="lesson-cell">
+                    <div class="lesson-number">{{ lesson }}</div>
+                    <button mat-icon-button
+                            class="lesson-clear-btn"
+                            (click)="clearLesson(lesson)"
+                            matTooltip="{{ 'ADMIN.SCHEDULE.CLEAR_LESSON' | translate }}">
+                      <mat-icon>clear</mat-icon>
+                    </button>
+                  </td>
+                  @for (day of days(); track day) {
+                    @let cell = getCell(lesson, day);
+                    <td class="grid-cell"
+                        [class.changed]="cell && isCellChanged(cell)"
+                        [class.conflict]="cell && hasCellConflict(cell)"
+                        [class.empty]="!cell?.subjectId">
+                      <mat-form-field appearance="outline" class="cell-select">
+                        <mat-select [value]="cell?.subjectId"
+                                    (selectionChange)="onCellChange(cell!, $event.value)"
+                                    [placeholder]="'ADMIN.SCHEDULE.EMPTY' | translate">
+                          <mat-option [value]="null">
+                            <span class="empty-option">{{ 'ADMIN.SCHEDULE.EMPTY' | translate }}</span>
+                          </mat-option>
+                          @for (subject of subjects(); track subject.id) {
+                            <mat-option [value]="subject.id">{{ subject.name }}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Conflicts Panel -->
+      @if (conflicts().length > 0) {
+        <div class="conflicts-panel">
+          <h3>{{ 'ADMIN.SCHEDULE.CONFLICTS' | translate }}</h3>
+
+          @if (teacherBusyConflicts().length > 0) {
+            <div class="conflict-section critical">
+              <h4>
+                <mat-icon>error</mat-icon>
+                {{ 'ADMIN.SCHEDULE.TEACHER_BUSY' | translate }}
+              </h4>
+              <ul>
+                @for (conflict of teacherBusyConflicts(); track $index) {
+                  <li>{{ conflict.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (maxLessonsExceededConflicts().length > 0) {
+            <div class="conflict-section critical">
+              <h4>
+                <mat-icon>error</mat-icon>
+                {{ 'ADMIN.SCHEDULE.MAX_LESSONS_EXCEEDED' | translate }}
+              </h4>
+              <ul>
+                @for (conflict of maxLessonsExceededConflicts(); track $index) {
+                  <li>{{ conflict.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (hoursMismatchConflicts().length > 0) {
+            <div class="conflict-section warning">
+              <h4>
+                <mat-icon>warning</mat-icon>
+                {{ 'ADMIN.SCHEDULE.HOURS_MISMATCH' | translate }}
+              </h4>
+              <ul>
+                @for (conflict of hoursMismatchConflicts(); track $index) {
+                  <li>{{ conflict.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="actions">
+      <button mat-stroked-button
+              [disabled]="!hasChanges() || saving()"
+              (click)="reset()">
+        <mat-icon>undo</mat-icon>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button mat-raised-button
+              color="primary"
+              [disabled]="!hasChanges() || saving()"
+              (click)="save()">
+        @if (saving()) {
+          <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+      @if (status() === 'DRAFT') {
+        <button mat-raised-button
+                color="accent"
+                [disabled]="hasChanges() || activating()"
+                (click)="activate()"
+                matTooltip="{{ hasChanges() ? ('ADMIN.SCHEDULE.SAVE_FIRST' | translate) : '' }}">
+          @if (activating()) {
+            <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+          } @else {
+            <mat-icon>check_circle</mat-icon>
+          }
+          {{ 'ADMIN.SCHEDULE.ACTIVATE' | translate }}
+        </button>
+      }
+    </div>
+  }
+</div>
