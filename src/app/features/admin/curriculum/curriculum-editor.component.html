@@ -63,6 +63,21 @@
             </div>
           </div>
 
+          <!-- Week settings -->
+          <div class="week-settings">
+            <span class="setting-label">{{ 'ADMIN.CURRICULUM.DAYS_PER_WEEK' | translate }}:</span>
+            <mat-form-field appearance="outline" class="days-select">
+              <mat-select [value]="daysPerWeek()" (selectionChange)="onDaysPerWeekChange($event.value)">
+                @for (option of daysPerWeekOptions; track option) {
+                  <mat-option [value]="option">{{ option }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            @if (daysPerWeek() !== originalDaysPerWeek()) {
+              <span class="changed-indicator" matTooltip="{{ 'ADMIN.CURRICULUM.CHANGED' | translate }}">*</span>
+            }
+          </div>
+
           <!-- Progress bar -->
           <div class="progress-section">
             <mat-progress-bar

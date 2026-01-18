@@ -11,6 +11,7 @@ export interface CurriculumLevel {
   nameRu: string;
   nameKk: string;
   maxLessonsPerDay: number;
+  daysPerWeek: number;
 }
 
 /**
@@ -32,6 +33,7 @@ export interface CurriculumSubjectsResponse {
   maxLessonsPerDay: number;
   maxHoursPerWeek: number;
   totalHoursPerWeek: number;
+  daysPerWeek?: number;
   subjects: CurriculumSubjectItem[];
   warnings: string[];
 }
@@ -41,6 +43,7 @@ export interface CurriculumSubjectsResponse {
  */
 export interface CurriculumUpdateRequest {
   items: { subjectId: string; hoursPerWeek: number }[];
+  daysPerWeek?: number;
 }
 
 /**

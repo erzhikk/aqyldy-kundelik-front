@@ -236,6 +236,76 @@
   }
 }
 
+// Week settings (days per week)
+.week-settings {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+
+  .setting-label {
+    font-size: 0.8125rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .changed-indicator {
+    color: #0f766e;
+    font-weight: 700;
+  }
+}
+
+.days-select {
+  width: 72px;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    padding: 0;
+    height: 36px;
+
+    &:hover {
+      border-color: #cbd5e1;
+    }
+
+    &.mdc-text-field--focused {
+      border-color: #0f766e;
+    }
+  }
+
+  ::ng-deep .mat-mdc-form-field-flex {
+    height: 36px;
+  }
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    padding: 0 0.5rem;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+  }
+
+  ::ng-deep .mdc-text-field--outlined .mdc-notched-outline {
+    display: none;
+  }
+
+  ::ng-deep .mat-mdc-select-value {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  ::ng-deep .mat-mdc-select-arrow-wrapper {
+    height: 36px;
+    padding-right: 0.25rem;
+  }
+}
+
 .table-container {
   overflow: auto;
 }

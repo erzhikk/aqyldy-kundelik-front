@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 import { CurriculumService, CurriculumLevel, CurriculumSubjectItem } from './curriculum.service';
 import { NotifyService } from '../../../core/ui/notify.service';
@@ -36,6 +37,7 @@ interface EditableSubject extends CurriculumSubjectItem {
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    MatSelectModule,
     MatTooltipModule,
     TranslateModule
   ]
@@ -52,11 +54,15 @@ export class CurriculumEditorComponent implements OnInit {
   originalMaxLessonsPerDay = signal(7);
   maxHoursPerWeek = signal(35);
   serverTotalHours = signal(0);
+  daysPerWeek = signal(5);
+  originalDaysPerWeek = signal(5);
   warnings = signal<string[]>([]);
   loading = signal(false);
   saving = signal(false);
   savingSettings = signal(false);
   editingMaxLessons = signal(false);
+
+  daysPerWeekOptions = [5, 6];
 
   displayedColumns = ['subject', 'hoursPerWeek'];
 
@@ -75,7 +81,9 @@ export class CurriculumEditorComponent implements OnInit {
   });
 
   hasChanges = computed(() => {
-    return this.subjects().some(s => s.hoursPerWeek !== s.originalHours);
+    const hoursChanged = this.subjects().some(s => s.hoursPerWeek !== s.originalHours);
+    const daysChanged = this.daysPerWeek() !== this.originalDaysPerWeek();
+    return hoursChanged || daysChanged;
   });
 
   hasErrors = computed(() => {
@@ -123,6 +131,10 @@ export class CurriculumEditorComponent implements OnInit {
         this.originalMaxLessonsPerDay.set(response.maxLessonsPerDay);
         this.maxHoursPerWeek.set(response.maxHoursPerWeek);
         this.serverTotalHours.set(response.totalHoursPerWeek);
+        // daysPerWeek: prefer from response, fallback to selectedLevel
+        const days = response.daysPerWeek ?? this.selectedLevel()?.daysPerWeek ?? 5;
+        this.daysPerWeek.set(days);
+        this.originalDaysPerWeek.set(days);
         this.warnings.set(response.warnings || []);
         this.loading.set(false);
       },
@@ -131,6 +143,10 @@ export class CurriculumEditorComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  onDaysPerWeekChange(value: number): void {
+    this.daysPerWeek.set(value);
   }
 
   onMaxLessonsChange(value: string): void {
@@ -200,7 +216,8 @@ export class CurriculumEditorComponent implements OnInit {
       items: this.subjects().map(s => ({
         subjectId: s.subjectId,
         hoursPerWeek: s.hoursPerWeek
-      }))
+      })),
+      daysPerWeek: this.daysPerWeek()
     };
 
     this.api.updateSubjects(this.selectedLevel()!.id, request).subscribe({
@@ -214,6 +231,15 @@ export class CurriculumEditorComponent implements OnInit {
         this.maxLessonsPerDay.set(response.maxLessonsPerDay);
         this.maxHoursPerWeek.set(response.maxHoursPerWeek);
         this.serverTotalHours.set(response.totalHoursPerWeek);
+        // Update daysPerWeek from response
+        const days = response.daysPerWeek ?? this.daysPerWeek();
+        this.daysPerWeek.set(days);
+        this.originalDaysPerWeek.set(days);
+        // Update in levels list
+        const updatedLevels = this.levels().map(l =>
+          l.id === this.selectedLevel()!.id ? { ...l, daysPerWeek: days } : l
+        );
+        this.levels.set(updatedLevels);
         this.warnings.set(response.warnings || []);
         this.notify.success('ADMIN.CURRICULUM.SAVE_SUCCESS');
         this.saving.set(false);
@@ -232,5 +258,6 @@ export class CurriculumEditorComponent implements OnInit {
       hasError: false
     }));
     this.subjects.set(resetSubjects);
+    this.daysPerWeek.set(this.originalDaysPerWeek());
   }
 }
