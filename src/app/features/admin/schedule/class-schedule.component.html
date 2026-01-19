@@ -95,6 +95,21 @@
         <div class="conflicts-panel">
           <h3>{{ 'ADMIN.SCHEDULE.CONFLICTS' | translate }}</h3>
 
+          <!-- Critical conflicts (block activation) -->
+          @if (planExceedsSlotsConflicts().length > 0) {
+            <div class="conflict-section critical">
+              <h4>
+                <mat-icon>error</mat-icon>
+                {{ 'ADMIN.SCHEDULE.PLAN_EXCEEDS_SLOTS' | translate }}
+              </h4>
+              <ul>
+                @for (conflict of planExceedsSlotsConflicts(); track $index) {
+                  <li>{{ conflict.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+
           @if (teacherBusyConflicts().length > 0) {
             <div class="conflict-section critical">
               <h4>
@@ -109,10 +124,25 @@
             </div>
           }
 
-          @if (maxLessonsExceededConflicts().length > 0) {
+          @if (invalidSlotRangeConflicts().length > 0) {
             <div class="conflict-section critical">
               <h4>
                 <mat-icon>error</mat-icon>
+                {{ 'ADMIN.SCHEDULE.INVALID_SLOT_RANGE' | translate }}
+              </h4>
+              <ul>
+                @for (conflict of invalidSlotRangeConflicts(); track $index) {
+                  <li>{{ conflict.message }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Warning conflicts (don't block activation) -->
+          @if (maxLessonsExceededConflicts().length > 0) {
+            <div class="conflict-section warning">
+              <h4>
+                <mat-icon>warning</mat-icon>
                 {{ 'ADMIN.SCHEDULE.MAX_LESSONS_EXCEEDED' | translate }}
               </h4>
               <ul>
@@ -161,9 +191,9 @@
       @if (status() === 'DRAFT') {
         <button mat-raised-button
                 color="accent"
-                [disabled]="hasChanges() || activating()"
+                [disabled]="hasChanges() || activating() || hasCriticalConflicts()"
                 (click)="activate()"
-                matTooltip="{{ hasChanges() ? ('ADMIN.SCHEDULE.SAVE_FIRST' | translate) : '' }}">
+                [matTooltip]="hasChanges() ? ('ADMIN.SCHEDULE.SAVE_FIRST' | translate) : (hasCriticalConflicts() ? ('ADMIN.SCHEDULE.ACTIVATION_BLOCKED_TOOLTIP' | translate) : '')">
           @if (activating()) {
             <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
           } @else {

@@ -16,8 +16,15 @@ export interface ScheduleCell {
 
 /**
  * Conflict type in schedule
+ * Critical types block activation: TEACHER_BUSY, PLAN_EXCEEDS_SLOTS, INVALID_SLOT_RANGE
+ * Warning types: HOURS_MISMATCH, MAX_LESSONS_EXCEEDED
  */
-export type ConflictType = 'TEACHER_BUSY' | 'MAX_LESSONS_EXCEEDED' | 'HOURS_MISMATCH';
+export type ConflictType = 'TEACHER_BUSY' | 'PLAN_EXCEEDS_SLOTS' | 'INVALID_SLOT_RANGE' | 'MAX_LESSONS_EXCEEDED' | 'HOURS_MISMATCH';
+
+/**
+ * Critical conflict types that block activation
+ */
+export const CRITICAL_CONFLICT_TYPES: ConflictType[] = ['TEACHER_BUSY', 'PLAN_EXCEEDS_SLOTS', 'INVALID_SLOT_RANGE'];
 
 /**
  * Schedule conflict info

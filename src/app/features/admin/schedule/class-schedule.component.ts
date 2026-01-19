@@ -9,18 +9,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import {
   ScheduleService,
   ScheduleCell,
   ScheduleConflict,
   ClassScheduleResponse,
-  ScheduleStatus
+  ScheduleStatus,
+  CRITICAL_CONFLICT_TYPES
 } from './schedule.service';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AssignmentsService, ClassAssignmentItem } from '../assignments/assignments.service';
 import { NotifyService } from '../../../core/ui/notify.service';
-import { ConfirmDialogService } from '../../../core/ui/confirm-dialog.service';
 
 interface GridCell {
   dayOfWeek: number;
@@ -60,8 +61,6 @@ export class ClassScheduleComponent implements OnInit {
   private scheduleApi = inject(ScheduleService);
   private assignmentsApi = inject(AssignmentsService);
   private notify = inject(NotifyService);
-  private confirmDialog = inject(ConfirmDialogService);
-  private translate = inject(TranslateService);
 
   classId = signal<string>('');
   classCode = signal<string>('');
@@ -87,10 +86,20 @@ export class ClassScheduleComponent implements OnInit {
     );
   });
 
+  // Critical conflicts (block activation)
   teacherBusyConflicts = computed(() =>
     this.conflicts().filter(c => c.type === 'TEACHER_BUSY')
   );
 
+  planExceedsSlotsConflicts = computed(() =>
+    this.conflicts().filter(c => c.type === 'PLAN_EXCEEDS_SLOTS')
+  );
+
+  invalidSlotRangeConflicts = computed(() =>
+    this.conflicts().filter(c => c.type === 'INVALID_SLOT_RANGE')
+  );
+
+  // Warning conflicts (don't block activation)
   maxLessonsExceededConflicts = computed(() =>
     this.conflicts().filter(c => c.type === 'MAX_LESSONS_EXCEEDED')
   );
@@ -99,8 +108,9 @@ export class ClassScheduleComponent implements OnInit {
     this.conflicts().filter(c => c.type === 'HOURS_MISMATCH')
   );
 
+  // Check if any critical conflicts exist
   hasCriticalConflicts = computed(() =>
-    this.teacherBusyConflicts().length > 0 || this.maxLessonsExceededConflicts().length > 0
+    this.conflicts().some(c => CRITICAL_CONFLICT_TYPES.includes(c.type))
   );
 
   ngOnInit(): void {
@@ -267,22 +277,12 @@ export class ClassScheduleComponent implements OnInit {
   }
 
   activate(): void {
+    // Critical conflicts block activation - button should be disabled
+    // This is a safeguard in case button is somehow clicked
     if (this.hasCriticalConflicts()) {
-      this.confirmDialog.confirm({
-        title: this.translate.instant('ADMIN.SCHEDULE.ACTIVATE_WITH_CONFLICTS_TITLE'),
-        message: this.translate.instant('ADMIN.SCHEDULE.ACTIVATE_WITH_CONFLICTS_MESSAGE'),
-        confirmText: this.translate.instant('ADMIN.SCHEDULE.ACTIVATE_ANYWAY'),
-        cancelText: this.translate.instant('COMMON.CANCEL'),
-        confirmColor: 'warn',
-        icon: 'warning'
-      }).subscribe(confirmed => {
-        if (confirmed) {
-          this.doActivate();
-        }
-      });
-    } else {
-      this.doActivate();
+      return;
     }
+    this.doActivate();
   }
 
   private doActivate(): void {
@@ -294,8 +294,14 @@ export class ClassScheduleComponent implements OnInit {
         this.notify.success('ADMIN.SCHEDULE.ACTIVATE_SUCCESS');
         this.activating.set(false);
       },
-      error: () => {
-        this.notify.error('ADMIN.SCHEDULE.ACTIVATE_ERROR');
+      error: (error: HttpErrorResponse) => {
+        // Handle 409 Conflict - backend rejected activation due to critical conflicts
+        if (error.status === 409 && error.error?.conflicts) {
+          this.conflicts.set(error.error.conflicts);
+          this.notify.error('ADMIN.SCHEDULE.ACTIVATION_BLOCKED');
+        } else {
+          this.notify.error('ADMIN.SCHEDULE.ACTIVATE_ERROR');
+        }
         this.activating.set(false);
       }
     });
