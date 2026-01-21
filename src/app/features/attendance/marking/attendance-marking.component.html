@@ -1,0 +1,83 @@
+<div class="marking-container">
+  <div class="marking-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-info">
+      <h2>{{ classCode() }} - {{ 'ATTENDANCE.LESSON' | translate }} {{ lessonNumber() }}</h2>
+      <p class="subtitle">{{ subjectName() }} | {{ date() }}</p>
+    </div>
+  </div>
+
+  @if (markedInfo()) {
+    <div class="marked-info">
+      <mat-icon>info</mat-icon>
+      <span>{{ 'ATTENDANCE.MARKED_BY' | translate }}: {{ markedInfo()!.markedByFullName }} ({{ formatMarkedAt(markedInfo()!.markedAt) }})</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (students().length === 0) {
+    <div class="empty-state">
+      <mat-icon>people_outline</mat-icon>
+      <p>{{ 'ATTENDANCE.NO_STUDENTS' | translate }}</p>
+    </div>
+  } @else {
+    <div class="students-card">
+      <div class="card-header">
+        <div class="select-all">
+          <mat-checkbox
+            [checked]="allPresent()"
+            [indeterminate]="somePresent()"
+            (change)="onSelectAllChange()">
+            {{ 'ATTENDANCE.SELECT_ALL' | translate }}
+          </mat-checkbox>
+        </div>
+        <div class="stats">
+          {{ 'ATTENDANCE.PRESENT_COUNT' | translate }}: {{ presentCount() }} / {{ totalCount() }}
+        </div>
+      </div>
+
+      <div class="students-list">
+        @for (student of students(); track student.studentId; let i = $index) {
+          <div class="student-item" [class.absent]="!student.present">
+            <span class="student-number">{{ i + 1 }}</span>
+            <span class="student-name">
+              {{ student.fullName }}
+              @if (student.present !== student.originalPresent) {
+                <span class="changed-indicator">*</span>
+              }
+            </span>
+            <mat-checkbox
+              [checked]="student.present"
+              (change)="onStudentChange(student, $event.checked)">
+            </mat-checkbox>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="actions">
+      <button mat-stroked-button
+              [disabled]="!hasChanges() || saving()"
+              (click)="reset()">
+        <mat-icon>undo</mat-icon>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button mat-raised-button
+              color="primary"
+              [disabled]="!hasChanges() || saving()"
+              (click)="save()">
+        @if (saving()) {
+          <mat-spinner diameter="20" class="btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ 'COMMON.SAVE' | translate }}
+      </button>
+    </div>
+  }
+</div>

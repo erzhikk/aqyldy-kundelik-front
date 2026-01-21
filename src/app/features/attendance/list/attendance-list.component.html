@@ -1,5 +1,71 @@
-<div class="placeholder-page">
-  <h1>✅ Attendance</h1>
-  <p>This page is under construction.</p>
-  <p class="hint">Here you will track student attendance, mark present/absent, view attendance reports.</p>
+<div class="attendance-container">
+  <div class="attendance-header">
+    <h2>{{ 'ATTENDANCE.TITLE' | translate }}</h2>
+    <p class="subtitle">{{ 'ATTENDANCE.SUBTITLE' | translate }}</p>
+  </div>
+
+  <div class="filters">
+    <mat-form-field appearance="outline" class="class-select">
+      <mat-label>{{ 'ATTENDANCE.CLASS' | translate }}</mat-label>
+      <mat-select [value]="selectedClassId()" (selectionChange)="onClassChange($event.value)">
+        @for (cls of classes(); track cls.id) {
+          <mat-option [value]="cls.id">{{ cls.code }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="date-picker">
+      <mat-label>{{ 'ATTENDANCE.DATE' | translate }}</mat-label>
+      <input matInput
+             [matDatepicker]="picker"
+             [value]="selectedDate()"
+             (dateChange)="onDateChange($event.value)">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  @if (loadingLessons()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (lessons().length === 0) {
+    <div class="empty-state">
+      <mat-icon>event_busy</mat-icon>
+      <p>{{ 'ATTENDANCE.NO_LESSONS' | translate }}</p>
+    </div>
+  } @else {
+    <div class="lessons-list">
+      <h3>{{ classCode() }} - {{ dateString() }}</h3>
+      <mat-nav-list>
+        @for (lesson of lessons(); track lesson.lessonNumber) {
+          <a mat-list-item (click)="openLesson(lesson)">
+            <div class="lesson-item">
+              <div class="lesson-number">{{ lesson.lessonNumber }}</div>
+              <div class="lesson-info">
+                <span class="subject-name">{{ getSubjectName(lesson) }}</span>
+                @if (lesson.teacherFullName) {
+                  <span class="teacher-name">{{ lesson.teacherFullName }}</span>
+                }
+              </div>
+              <div class="lesson-status">
+                @if (lesson.hasAttendance) {
+                  <span class="marked-badge">
+                    <mat-icon>check_circle</mat-icon>
+                    {{ 'ATTENDANCE.MARKED' | translate }}
+                  </span>
+                } @else {
+                  <span class="not-marked-badge">
+                    <mat-icon>radio_button_unchecked</mat-icon>
+                    {{ 'ATTENDANCE.NOT_MARKED' | translate }}
+                  </span>
+                }
+              </div>
+              <mat-icon class="chevron">chevron_right</mat-icon>
+            </div>
+          </a>
+        }
+      </mat-nav-list>
+    </div>
+  }
 </div>

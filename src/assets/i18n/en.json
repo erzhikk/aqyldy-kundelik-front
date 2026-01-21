@@ -41,6 +41,25 @@
     "NO_TESTS": "No available tests",
     "NO_TESTS_DESCRIPTION": "There are currently no published tests available"
   },
+  "ATTENDANCE": {
+    "TITLE": "Attendance",
+    "SUBTITLE": "Mark student attendance for lessons",
+    "CLASS": "Class",
+    "DATE": "Date",
+    "LESSON": "Lesson",
+    "MARKED": "Marked",
+    "NOT_MARKED": "Not marked",
+    "NO_LESSONS": "No lessons for the selected date",
+    "NO_STUDENTS": "No students in the class",
+    "SELECT_ALL": "Select all (present)",
+    "PRESENT_COUNT": "Present",
+    "MARKED_BY": "Marked by",
+    "LOAD_CLASSES_ERROR": "Failed to load classes",
+    "LOAD_LESSONS_ERROR": "Failed to load lessons",
+    "LOAD_ERROR": "Failed to load data",
+    "SAVE_SUCCESS": "Attendance saved",
+    "SAVE_ERROR": "Failed to save attendance"
+  },
   "ANALYTICS": {
     "STUDENT_TITLE": "My Analytics",
     "STUDENT_SUBTITLE": "Track your performance and identify areas for improvement",

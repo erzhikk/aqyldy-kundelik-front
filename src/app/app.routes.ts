@@ -66,6 +66,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/attendance/list/attendance-list.component').then(m => m.AttendanceListComponent)
       },
       {
+        path: 'attendance/:classId/lessons/:lessonNumber',
+        loadComponent: () => import('./features/attendance/marking/attendance-marking.component').then(m => m.AttendanceMarkingComponent)
+      },
+      {
         path: 'assess/tests',
         loadComponent: () => import('./features/assess/tests/list/tests-list.component').then(m => m.TestsListComponent)
       },
